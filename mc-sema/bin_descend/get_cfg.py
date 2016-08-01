@@ -20,6 +20,8 @@ import traceback
 
 import itertools
 
+print sys.executable
+
 #hack for IDAPython to see google protobuf lib
 sys.path.append('/usr/lib/python2.7/dist-packages')
 import CFG_pb2
@@ -1788,6 +1790,11 @@ if __name__ == "__main__":
         help="File containing <name> <address> pairs of symbols to pre-define."
         )
 
+    parser.add_argument("--stack_vars", action="store_true",
+        default=False,
+        help="Attempt to recover local stack varible information"
+        )
+
     args = parser.parse_args(args=idc.ARGV[1:])
 
     if args.debug:
@@ -1818,6 +1825,11 @@ if __name__ == "__main__":
 
         EMAP = {}
         EMAP_DATA = {}
+
+        if args.stack_vars:
+            DEBUG("Attempting to recover stack variable information...")
+            from var_recovery import collect_ida
+            collect_ida.print_func_vars()
 
         if len(args.std_defs) > 0:
             for defsfile in args.std_defs:

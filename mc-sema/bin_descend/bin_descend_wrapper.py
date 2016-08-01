@@ -120,7 +120,7 @@ if __name__ == "__main__":
     in_fname, in_ext = splitext(input_file)
     output_file = in_fname + ".cfg"
 
-    new_args.extend(['--output', output_file])
+    new_args.extend(['--output', output_file, '--stack_vars', '-d'])
 
     internal_args = [GET_CFG_PY]
     internal_args.extend(new_args)
