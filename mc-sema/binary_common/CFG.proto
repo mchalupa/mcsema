@@ -69,11 +69,22 @@ message Variable {
         Array = 0;
         Struc = 1;
     }
+    // not sure this is what we want here, just throwing it in for now 
+    //enum Type {
+    //    Int = 0;
+    //    Ptr = 1;
+    //    Char = 2;
+    //}
+    //enum OtherType {
+    //    Array = 0;
+    //    Struc = 1;
+    //}
 
     required    string  name = 1;
     required    int64   size = 2;
-    required    Type    type = 3; // ???
-    optional    OtherType othertype = 4; // ???
+    //required    Type    type = 3; // ???
+    required    string  ida_type = 3; // TODO make into better :P
+    //optional    OtherType othertype = 4; // ???
 
     // instructions referring to this variable
     // have run into issues with protobuf format before trying to make this

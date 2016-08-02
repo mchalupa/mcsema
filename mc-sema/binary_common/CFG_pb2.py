@@ -13,7 +13,7 @@ from google.protobuf import descriptor_pb2
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='CFG.proto',
   package='',
-  serialized_pb='\n\tCFG.proto\"N\n\x0bOffsetTable\x12\x12\n\nstart_addr\x18\x01 \x02(\x03\x12\x15\n\rtable_offsets\x18\x02 \x03(\x03\x12\x14\n\x0c\x64\x65stinations\x18\x03 \x03(\x03\"O\n\x07JumpTbl\x12\x15\n\rtable_entries\x18\x01 \x03(\x03\x12\x13\n\x0bzero_offset\x18\x02 \x02(\x05\x12\x18\n\x10offset_from_data\x18\x03 \x01(\x03\":\n\x0cJumpIndexTbl\x12\x15\n\rtable_entries\x18\x01 \x02(\x0c\x12\x13\n\x0bzero_offset\x18\x02 \x02(\x05\"\x94\x04\n\x0bInstruction\x12\x12\n\ninst_bytes\x18\x01 \x02(\x0c\x12\x11\n\tinst_addr\x18\x02 \x02(\x03\x12\x13\n\x0btrue_target\x18\x03 \x01(\x03\x12\x14\n\x0c\x66\x61lse_target\x18\x04 \x01(\x03\x12\x10\n\x08inst_len\x18\x05 \x02(\x05\x12\x15\n\rimm_reference\x18\x06 \x01(\x03\x12\x18\n\x10imm_reloc_offset\x18\x0f \x01(\x03\x12*\n\x0cimm_ref_type\x18\x10 \x01(\x0e\x32\x14.Instruction.RefType\x12\x15\n\rmem_reference\x18\x08 \x01(\x03\x12\x18\n\x10mem_reloc_offset\x18\t \x01(\x03\x12*\n\x0cmem_ref_type\x18\x12 \x01(\x0e\x32\x14.Instruction.RefType\x12\x15\n\rext_call_name\x18\x07 \x01(\t\x12\x1c\n\njump_table\x18\n \x01(\x0b\x32\x08.JumpTbl\x12\'\n\x10jump_index_table\x18\x0b \x01(\x0b\x32\r.JumpIndexTbl\x12\x15\n\rext_data_name\x18\x0c \x01(\t\x12\x1a\n\x12system_call_number\x18\r \x01(\x05\x12\x16\n\x0elocal_noreturn\x18\x0e \x01(\x08\x12\x19\n\x11offset_table_addr\x18\x13 \x01(\x03\"#\n\x07RefType\x12\x0b\n\x07\x43odeRef\x10\x00\x12\x0b\n\x07\x44\x61taRef\x10\x01\"Q\n\x05\x42lock\x12\x1b\n\x05insts\x18\x01 \x03(\x0b\x32\x0c.Instruction\x12\x14\n\x0c\x62\x61se_address\x18\x02 \x02(\x03\x12\x15\n\rblock_follows\x18\x03 \x03(\x03\"\xd4\x01\n\x08Variable\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x0c\n\x04size\x18\x02 \x02(\x03\x12\x1c\n\x04type\x18\x03 \x02(\x0e\x32\x0e.Variable.Type\x12&\n\tothertype\x18\x04 \x01(\x0e\x32\x13.Variable.OtherType\x12\x1f\n\tinst_refs\x18\x05 \x03(\x0b\x32\x0c.Instruction\"\"\n\x04Type\x12\x07\n\x03Int\x10\x00\x12\x07\n\x03Ptr\x10\x01\x12\x08\n\x04\x43har\x10\x02\"!\n\tOtherType\x12\t\n\x05\x41rray\x10\x00\x12\t\n\x05Struc\x10\x01\"5\n\x08StackVar\x12\x16\n\x03var\x18\x01 \x02(\x0b\x32\t.Variable\x12\x11\n\tsp_offset\x18\x02 \x02(\x03\"l\n\x08\x46unction\x12\x16\n\x06\x62locks\x18\x01 \x03(\x0b\x32\x06.Block\x12\x15\n\rentry_address\x18\x02 \x02(\x03\x12\x1c\n\tstackvars\x18\x03 \x03(\x0b\x32\t.StackVar\x12\x13\n\x0bsymbol_name\x18\x04 \x01(\t\"\xa4\x02\n\x10\x45xternalFunction\x12\x13\n\x0bsymbol_name\x18\x01 \x02(\t\x12?\n\x12\x63\x61lling_convention\x18\x02 \x02(\x0e\x32#.ExternalFunction.CallingConvention\x12\x12\n\nhas_return\x18\x03 \x02(\x08\x12\x11\n\tno_return\x18\x04 \x02(\x08\x12\x16\n\x0e\x61rgument_count\x18\x05 \x02(\x05\x12\x0f\n\x07is_weak\x18\x06 \x02(\x08\x12\x11\n\tsignature\x18\x07 \x01(\t\"W\n\x11\x43\x61llingConvention\x12\x11\n\rCallerCleanup\x10\x00\x12\x11\n\rCalleeCleanup\x10\x01\x12\x0c\n\x08\x46\x61stCall\x10\x02\x12\x0e\n\nMcsemaCall\x10\x03\"G\n\x0c\x45xternalData\x12\x13\n\x0bsymbol_name\x18\x01 \x02(\t\x12\x11\n\tdata_size\x18\x02 \x02(\x05\x12\x0f\n\x07is_weak\x18\x03 \x02(\x08\"L\n\nDataSymbol\x12\x14\n\x0c\x62\x61se_address\x18\x01 \x02(\x03\x12\x13\n\x0bsymbol_name\x18\x02 \x02(\t\x12\x13\n\x0bsymbol_size\x18\x03 \x02(\x05\"[\n\x04\x44\x61ta\x12\x14\n\x0c\x62\x61se_address\x18\x01 \x02(\x03\x12\x0c\n\x04\x64\x61ta\x18\x02 \x02(\x0c\x12\x1c\n\x07symbols\x18\x03 \x03(\x0b\x32\x0b.DataSymbol\x12\x11\n\tread_only\x18\x04 \x02(\x08\"u\n\x10\x45ntrySymbolExtra\x12\x12\n\nentry_argc\x18\x01 \x02(\x05\x12\x38\n\x0b\x65ntry_cconv\x18\x02 \x02(\x0e\x32#.ExternalFunction.CallingConvention\x12\x13\n\x0b\x64oes_return\x18\x03 \x02(\x08\"`\n\x0b\x45ntrySymbol\x12\x12\n\nentry_name\x18\x01 \x02(\t\x12\x15\n\rentry_address\x18\x02 \x02(\x03\x12&\n\x0b\x65ntry_extra\x18\x03 \x01(\x0b\x32\x11.EntrySymbolExtra\"\xf3\x01\n\x06Module\x12!\n\x0einternal_funcs\x18\x01 \x03(\x0b\x32\t.Function\x12)\n\x0e\x65xternal_funcs\x18\x02 \x03(\x0b\x32\x11.ExternalFunction\x12\x1c\n\rinternal_data\x18\x03 \x03(\x0b\x32\x05.Data\x12\x13\n\x0bmodule_name\x18\x04 \x02(\t\x12\x1d\n\x07\x65ntries\x18\x05 \x03(\x0b\x32\x0c.EntrySymbol\x12$\n\rexternal_data\x18\x06 \x03(\x0b\x32\r.ExternalData\x12#\n\roffset_tables\x18\x07 \x03(\x0b\x32\x0c.OffsetTable\"l\n\x07\x45\x64ge_64\x12\r\n\x05value\x18\x01 \x02(\x03\x12\x1b\n\x04kind\x18\x02 \x02(\x0e\x32\r.Edge_64.Kind\x12\r\n\x05label\x18\x03 \x01(\x08\"&\n\x04Kind\x12\x0b\n\x07Unknown\x10\x00\x12\x07\n\x03May\x10\x01\x12\x08\n\x04Must\x10\x02\"l\n\x07\x45\x64ge_32\x12\r\n\x05value\x18\x01 \x02(\x05\x12\x1b\n\x04kind\x18\x02 \x02(\x0e\x32\r.Edge_32.Kind\x12\r\n\x05label\x18\x03 \x01(\x08\"&\n\x04Kind\x12\x0b\n\x07Unknown\x10\x00\x12\x07\n\x03May\x10\x01\x12\x08\n\x04Must\x10\x02\"\x85\x04\n\x1c\x41nnotated_Branch_Instruction\x12?\n\x11\x62ranch_instr_name\x18\x01 \x02(\x0e\x32$.Annotated_Branch_Instruction.Branch\x12\x13\n\x0bis_resolved\x18\x02 \x02(\x08\x12\x13\n\x0bis_indirect\x18\x03 \x02(\x08\x12\x16\n\x0eis_conditional\x18\x04 \x02(\x08\x12\x0f\n\x07is_leaf\x18\x05 \x02(\x08\x12\x1b\n\ttarget_to\x18\x06 \x03(\x0b\x32\x08.Edge_64\x12%\n\x05instr\x18\x07 \x02(\x0b\x32\x16.Annotated_Instruction\x12\x1b\n\x13\x61\x62stract_expression\x18\x08 \x01(\t\"\xef\x01\n\x06\x42ranch\x12\x0b\n\x07Unknown\x10\x00\x12\x07\n\x03jmp\x10\x01\x12\x08\n\x04ljmp\x10\x02\x12\x06\n\x02jo\x10\x03\x12\x07\n\x03jno\x10\x04\x12\x06\n\x02jb\x10\x05\x12\x07\n\x03jae\x10\x06\x12\x06\n\x02je\x10\x07\x12\x07\n\x03jne\x10\x08\x12\x07\n\x03jbe\x10\t\x12\x06\n\x02ja\x10\n\x12\x06\n\x02js\x10\x0b\x12\x07\n\x03jns\x10\x0c\x12\x06\n\x02jp\x10\r\x12\x07\n\x03jnp\x10\x0e\x12\x06\n\x02jl\x10\x0f\x12\x07\n\x03jge\x10\x10\x12\x07\n\x03jle\x10\x11\x12\x06\n\x02jg\x10\x12\x12\n\n\x06loopne\x10\x13\x12\t\n\x05loope\x10\x14\x12\x08\n\x04loop\x10\x15\x12\t\n\x05jCcxz\x10\x16\x12\x07\n\x03ret\x10\x17\x12\x08\n\x04\x63\x61ll\x10\x18\"\xb8\x03\n\x15\x41nnotated_Instruction\x12\x12\n\ninstr_name\x18\x01 \x02(\t\x12\x14\n\x0cinstr_string\x18\x02 \x02(\t\x12\x11\n\tinst_addr\x18\x03 \x02(\x03\x12\x10\n\x08inst_len\x18\x04 \x02(\x05\x12\x10\n\x08op_count\x18\x05 \x02(\x05\x12\x15\n\rinst_addr_hex\x18\x06 \x01(\t\x12\x1d\n\x15is_branch_instruction\x18\x07 \x02(\x08\x12\x30\n\x08\x61rgument\x18\x08 \x03(\x0b\x32\x1e.Annotated_Instruction.Operand\x12 \n\x0ereferered_from\x18\t \x03(\x0b\x32\x08.Edge_64\x1a\xb3\x01\n\x07Operand\x12\x0b\n\x03pos\x18\x01 \x02(\x05\x12\x39\n\x04type\x18\x02 \x02(\x0e\x32+.Annotated_Instruction.Operand.Operand_Type\x12\r\n\x05value\x18\x03 \x01(\t\"Q\n\x0cOperand_Type\x12\x0b\n\x07Unknown\x10\x00\x12\r\n\tImmediate\x10\x01\x12\x0c\n\x08Register\x10\x02\x12\n\n\x06Memory\x10\x03\x12\x0b\n\x07\x41\x64\x64ress\x10\x04\"\xa9\x03\n\x15\x41nnotated_Register_32\x12-\n\x04name\x18\x01 \x02(\x0e\x32\x1f.Annotated_Register_32.Register\x12\x14\n\x0cused_at_addr\x18\x02 \x02(\x03\x12\x18\n\x10used_at_addr_hex\x18\x03 \x01(\t\x12\x17\n\x05value\x18\x07 \x03(\x0b\x32\x08.Edge_32\x12-\n\x04\x66\x61\x63t\x18\x08 \x02(\x0b\x32\x1f.Annotated_Register_32.Property\x12\x1b\n\x13\x61\x62stract_expression\x18\t \x01(\t\x1a*\n\x08Property\x12\x0f\n\x07Unknown\x18\x01 \x02(\x08\x12\r\n\x05\x41live\x18\x02 \x01(\x08\"\x9f\x01\n\x08Register\x12\x0b\n\x07Unknown\x10\x00\x12\x07\n\x03\x65\x61x\x10\x01\x12\x07\n\x03\x65\x63x\x10\x02\x12\x07\n\x03\x65\x64x\x10\x03\x12\x07\n\x03\x65\x62x\x10\x04\x12\x07\n\x03\x65sp\x10\x05\x12\x07\n\x03\x65\x62p\x10\x06\x12\x07\n\x03\x65si\x10\x07\x12\x07\n\x03\x65\x64i\x10\x08\x12\x07\n\x03\x65ip\x10\t\x12\x0b\n\x07\x66s_base\x10\n\x12\x0b\n\x07gs_base\x10\x0b\x12\x07\n\x03gtd\x10\x0c\x12\x07\n\x03ldt\x10\r\x12\t\n\x05mxcsr\x10\x0e\"\xe4\x03\n\x15\x41nnotated_Register_64\x12-\n\x04name\x18\x01 \x02(\x0e\x32\x1f.Annotated_Register_64.Register\x12\x14\n\x0cused_at_addr\x18\x02 \x02(\x03\x12\x18\n\x10used_at_addr_hex\x18\x03 \x01(\t\x12\x17\n\x05value\x18\x04 \x03(\x0b\x32\x08.Edge_64\x12-\n\x04\x66\x61\x63t\x18\x05 \x02(\x0b\x32\x1f.Annotated_Register_64.Property\x12\x1b\n\x13\x61\x62stract_expression\x18\x06 \x01(\t\x1a*\n\x08Property\x12\x0f\n\x07Unknown\x18\x01 \x02(\x08\x12\r\n\x05\x41live\x18\x02 \x01(\x08\"\xda\x01\n\x08Register\x12\x0b\n\x07Unknown\x10\x00\x12\x07\n\x03rax\x10\n\x12\x07\n\x03rcx\x10\x0b\x12\x07\n\x03rdx\x10\x0c\x12\x07\n\x03rbx\x10\r\x12\x07\n\x03rsp\x10\x0e\x12\x07\n\x03rbp\x10\x0f\x12\x07\n\x03rsi\x10\x10\x12\x07\n\x03rdi\x10\x11\x12\x07\n\x03rip\x10\x12\x12\x06\n\x02r8\x10\x13\x12\x06\n\x02r9\x10\x14\x12\x07\n\x03r10\x10\x15\x12\x07\n\x03r11\x10\x16\x12\x07\n\x03r12\x10\x17\x12\x07\n\x03r13\x10\x18\x12\x07\n\x03r14\x10\x19\x12\x07\n\x03r15\x10\x1a\x12\x0b\n\x07\x66s_base\x10\x1b\x12\x0b\n\x07gs_base\x10\x1c\x12\x07\n\x03gdt\x10\x1d\x12\x07\n\x03ldt\x10\x1e\"\x8d\x02\n\x12\x41nnotated_Function\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x15\n\rstart_at_addr\x18\x02 \x02(\x03\x12\x19\n\x11start_at_addr_hex\x18\x03 \x01(\t\x12\x13\n\x0b\x65nd_at_addr\x18\x04 \x01(\x03\x12\x17\n\x0f\x65nd_at_addr_hex\x18\x05 \x01(\t\x12&\n\x06prolog\x18\x06 \x03(\x0b\x32\x16.Annotated_Instruction\x12&\n\x06\x65pilog\x18\x07 \x03(\x0b\x32\x16.Annotated_Instruction\x12 \n\x0ereferered_from\x18\x08 \x03(\x0b\x32\x08.Edge_64\x12\x17\n\x05\x63\x61lls\x18\t \x03(\x0b\x32\x08.Edge_64\"\xdc\x01\n\x0b\x44isassembly\x12%\n\x05instr\x18\x01 \x03(\x0b\x32\x16.Annotated_Instruction\x12\x33\n\x0c\x62ranch_instr\x18\x02 \x03(\x0b\x32\x1d.Annotated_Branch_Instruction\x12&\n\x06reg_32\x18\x03 \x03(\x0b\x32\x16.Annotated_Register_32\x12&\n\x06reg_64\x18\x04 \x03(\x0b\x32\x16.Annotated_Register_64\x12!\n\x04\x66unc\x18\x05 \x03(\x0b\x32\x13.Annotated_Function')
+  serialized_pb='\n\tCFG.proto\"N\n\x0bOffsetTable\x12\x12\n\nstart_addr\x18\x01 \x02(\x03\x12\x15\n\rtable_offsets\x18\x02 \x03(\x03\x12\x14\n\x0c\x64\x65stinations\x18\x03 \x03(\x03\"O\n\x07JumpTbl\x12\x15\n\rtable_entries\x18\x01 \x03(\x03\x12\x13\n\x0bzero_offset\x18\x02 \x02(\x05\x12\x18\n\x10offset_from_data\x18\x03 \x01(\x03\":\n\x0cJumpIndexTbl\x12\x15\n\rtable_entries\x18\x01 \x02(\x0c\x12\x13\n\x0bzero_offset\x18\x02 \x02(\x05\"\x94\x04\n\x0bInstruction\x12\x12\n\ninst_bytes\x18\x01 \x02(\x0c\x12\x11\n\tinst_addr\x18\x02 \x02(\x03\x12\x13\n\x0btrue_target\x18\x03 \x01(\x03\x12\x14\n\x0c\x66\x61lse_target\x18\x04 \x01(\x03\x12\x10\n\x08inst_len\x18\x05 \x02(\x05\x12\x15\n\rimm_reference\x18\x06 \x01(\x03\x12\x18\n\x10imm_reloc_offset\x18\x0f \x01(\x03\x12*\n\x0cimm_ref_type\x18\x10 \x01(\x0e\x32\x14.Instruction.RefType\x12\x15\n\rmem_reference\x18\x08 \x01(\x03\x12\x18\n\x10mem_reloc_offset\x18\t \x01(\x03\x12*\n\x0cmem_ref_type\x18\x12 \x01(\x0e\x32\x14.Instruction.RefType\x12\x15\n\rext_call_name\x18\x07 \x01(\t\x12\x1c\n\njump_table\x18\n \x01(\x0b\x32\x08.JumpTbl\x12\'\n\x10jump_index_table\x18\x0b \x01(\x0b\x32\r.JumpIndexTbl\x12\x15\n\rext_data_name\x18\x0c \x01(\t\x12\x1a\n\x12system_call_number\x18\r \x01(\x05\x12\x16\n\x0elocal_noreturn\x18\x0e \x01(\x08\x12\x19\n\x11offset_table_addr\x18\x13 \x01(\x03\"#\n\x07RefType\x12\x0b\n\x07\x43odeRef\x10\x00\x12\x0b\n\x07\x44\x61taRef\x10\x01\"Q\n\x05\x42lock\x12\x1b\n\x05insts\x18\x01 \x03(\x0b\x32\x0c.Instruction\x12\x14\n\x0c\x62\x61se_address\x18\x02 \x02(\x03\x12\x15\n\rblock_follows\x18\x03 \x03(\x03\"\xa0\x01\n\x08Variable\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x0c\n\x04size\x18\x02 \x02(\x03\x12\x10\n\x08ida_type\x18\x03 \x02(\t\x12\x1f\n\tinst_refs\x18\x05 \x03(\x0b\x32\x0c.Instruction\"\"\n\x04Type\x12\x07\n\x03Int\x10\x00\x12\x07\n\x03Ptr\x10\x01\x12\x08\n\x04\x43har\x10\x02\"!\n\tOtherType\x12\t\n\x05\x41rray\x10\x00\x12\t\n\x05Struc\x10\x01\"5\n\x08StackVar\x12\x16\n\x03var\x18\x01 \x02(\x0b\x32\t.Variable\x12\x11\n\tsp_offset\x18\x02 \x02(\x03\"l\n\x08\x46unction\x12\x16\n\x06\x62locks\x18\x01 \x03(\x0b\x32\x06.Block\x12\x15\n\rentry_address\x18\x02 \x02(\x03\x12\x1c\n\tstackvars\x18\x03 \x03(\x0b\x32\t.StackVar\x12\x13\n\x0bsymbol_name\x18\x04 \x01(\t\"\xa4\x02\n\x10\x45xternalFunction\x12\x13\n\x0bsymbol_name\x18\x01 \x02(\t\x12?\n\x12\x63\x61lling_convention\x18\x02 \x02(\x0e\x32#.ExternalFunction.CallingConvention\x12\x12\n\nhas_return\x18\x03 \x02(\x08\x12\x11\n\tno_return\x18\x04 \x02(\x08\x12\x16\n\x0e\x61rgument_count\x18\x05 \x02(\x05\x12\x0f\n\x07is_weak\x18\x06 \x02(\x08\x12\x11\n\tsignature\x18\x07 \x01(\t\"W\n\x11\x43\x61llingConvention\x12\x11\n\rCallerCleanup\x10\x00\x12\x11\n\rCalleeCleanup\x10\x01\x12\x0c\n\x08\x46\x61stCall\x10\x02\x12\x0e\n\nMcsemaCall\x10\x03\"G\n\x0c\x45xternalData\x12\x13\n\x0bsymbol_name\x18\x01 \x02(\t\x12\x11\n\tdata_size\x18\x02 \x02(\x05\x12\x0f\n\x07is_weak\x18\x03 \x02(\x08\"L\n\nDataSymbol\x12\x14\n\x0c\x62\x61se_address\x18\x01 \x02(\x03\x12\x13\n\x0bsymbol_name\x18\x02 \x02(\t\x12\x13\n\x0bsymbol_size\x18\x03 \x02(\x05\"[\n\x04\x44\x61ta\x12\x14\n\x0c\x62\x61se_address\x18\x01 \x02(\x03\x12\x0c\n\x04\x64\x61ta\x18\x02 \x02(\x0c\x12\x1c\n\x07symbols\x18\x03 \x03(\x0b\x32\x0b.DataSymbol\x12\x11\n\tread_only\x18\x04 \x02(\x08\"u\n\x10\x45ntrySymbolExtra\x12\x12\n\nentry_argc\x18\x01 \x02(\x05\x12\x38\n\x0b\x65ntry_cconv\x18\x02 \x02(\x0e\x32#.ExternalFunction.CallingConvention\x12\x13\n\x0b\x64oes_return\x18\x03 \x02(\x08\"`\n\x0b\x45ntrySymbol\x12\x12\n\nentry_name\x18\x01 \x02(\t\x12\x15\n\rentry_address\x18\x02 \x02(\x03\x12&\n\x0b\x65ntry_extra\x18\x03 \x01(\x0b\x32\x11.EntrySymbolExtra\"\xf3\x01\n\x06Module\x12!\n\x0einternal_funcs\x18\x01 \x03(\x0b\x32\t.Function\x12)\n\x0e\x65xternal_funcs\x18\x02 \x03(\x0b\x32\x11.ExternalFunction\x12\x1c\n\rinternal_data\x18\x03 \x03(\x0b\x32\x05.Data\x12\x13\n\x0bmodule_name\x18\x04 \x02(\t\x12\x1d\n\x07\x65ntries\x18\x05 \x03(\x0b\x32\x0c.EntrySymbol\x12$\n\rexternal_data\x18\x06 \x03(\x0b\x32\r.ExternalData\x12#\n\roffset_tables\x18\x07 \x03(\x0b\x32\x0c.OffsetTable\"l\n\x07\x45\x64ge_64\x12\r\n\x05value\x18\x01 \x02(\x03\x12\x1b\n\x04kind\x18\x02 \x02(\x0e\x32\r.Edge_64.Kind\x12\r\n\x05label\x18\x03 \x01(\x08\"&\n\x04Kind\x12\x0b\n\x07Unknown\x10\x00\x12\x07\n\x03May\x10\x01\x12\x08\n\x04Must\x10\x02\"l\n\x07\x45\x64ge_32\x12\r\n\x05value\x18\x01 \x02(\x05\x12\x1b\n\x04kind\x18\x02 \x02(\x0e\x32\r.Edge_32.Kind\x12\r\n\x05label\x18\x03 \x01(\x08\"&\n\x04Kind\x12\x0b\n\x07Unknown\x10\x00\x12\x07\n\x03May\x10\x01\x12\x08\n\x04Must\x10\x02\"\x85\x04\n\x1c\x41nnotated_Branch_Instruction\x12?\n\x11\x62ranch_instr_name\x18\x01 \x02(\x0e\x32$.Annotated_Branch_Instruction.Branch\x12\x13\n\x0bis_resolved\x18\x02 \x02(\x08\x12\x13\n\x0bis_indirect\x18\x03 \x02(\x08\x12\x16\n\x0eis_conditional\x18\x04 \x02(\x08\x12\x0f\n\x07is_leaf\x18\x05 \x02(\x08\x12\x1b\n\ttarget_to\x18\x06 \x03(\x0b\x32\x08.Edge_64\x12%\n\x05instr\x18\x07 \x02(\x0b\x32\x16.Annotated_Instruction\x12\x1b\n\x13\x61\x62stract_expression\x18\x08 \x01(\t\"\xef\x01\n\x06\x42ranch\x12\x0b\n\x07Unknown\x10\x00\x12\x07\n\x03jmp\x10\x01\x12\x08\n\x04ljmp\x10\x02\x12\x06\n\x02jo\x10\x03\x12\x07\n\x03jno\x10\x04\x12\x06\n\x02jb\x10\x05\x12\x07\n\x03jae\x10\x06\x12\x06\n\x02je\x10\x07\x12\x07\n\x03jne\x10\x08\x12\x07\n\x03jbe\x10\t\x12\x06\n\x02ja\x10\n\x12\x06\n\x02js\x10\x0b\x12\x07\n\x03jns\x10\x0c\x12\x06\n\x02jp\x10\r\x12\x07\n\x03jnp\x10\x0e\x12\x06\n\x02jl\x10\x0f\x12\x07\n\x03jge\x10\x10\x12\x07\n\x03jle\x10\x11\x12\x06\n\x02jg\x10\x12\x12\n\n\x06loopne\x10\x13\x12\t\n\x05loope\x10\x14\x12\x08\n\x04loop\x10\x15\x12\t\n\x05jCcxz\x10\x16\x12\x07\n\x03ret\x10\x17\x12\x08\n\x04\x63\x61ll\x10\x18\"\xb8\x03\n\x15\x41nnotated_Instruction\x12\x12\n\ninstr_name\x18\x01 \x02(\t\x12\x14\n\x0cinstr_string\x18\x02 \x02(\t\x12\x11\n\tinst_addr\x18\x03 \x02(\x03\x12\x10\n\x08inst_len\x18\x04 \x02(\x05\x12\x10\n\x08op_count\x18\x05 \x02(\x05\x12\x15\n\rinst_addr_hex\x18\x06 \x01(\t\x12\x1d\n\x15is_branch_instruction\x18\x07 \x02(\x08\x12\x30\n\x08\x61rgument\x18\x08 \x03(\x0b\x32\x1e.Annotated_Instruction.Operand\x12 \n\x0ereferered_from\x18\t \x03(\x0b\x32\x08.Edge_64\x1a\xb3\x01\n\x07Operand\x12\x0b\n\x03pos\x18\x01 \x02(\x05\x12\x39\n\x04type\x18\x02 \x02(\x0e\x32+.Annotated_Instruction.Operand.Operand_Type\x12\r\n\x05value\x18\x03 \x01(\t\"Q\n\x0cOperand_Type\x12\x0b\n\x07Unknown\x10\x00\x12\r\n\tImmediate\x10\x01\x12\x0c\n\x08Register\x10\x02\x12\n\n\x06Memory\x10\x03\x12\x0b\n\x07\x41\x64\x64ress\x10\x04\"\xa9\x03\n\x15\x41nnotated_Register_32\x12-\n\x04name\x18\x01 \x02(\x0e\x32\x1f.Annotated_Register_32.Register\x12\x14\n\x0cused_at_addr\x18\x02 \x02(\x03\x12\x18\n\x10used_at_addr_hex\x18\x03 \x01(\t\x12\x17\n\x05value\x18\x07 \x03(\x0b\x32\x08.Edge_32\x12-\n\x04\x66\x61\x63t\x18\x08 \x02(\x0b\x32\x1f.Annotated_Register_32.Property\x12\x1b\n\x13\x61\x62stract_expression\x18\t \x01(\t\x1a*\n\x08Property\x12\x0f\n\x07Unknown\x18\x01 \x02(\x08\x12\r\n\x05\x41live\x18\x02 \x01(\x08\"\x9f\x01\n\x08Register\x12\x0b\n\x07Unknown\x10\x00\x12\x07\n\x03\x65\x61x\x10\x01\x12\x07\n\x03\x65\x63x\x10\x02\x12\x07\n\x03\x65\x64x\x10\x03\x12\x07\n\x03\x65\x62x\x10\x04\x12\x07\n\x03\x65sp\x10\x05\x12\x07\n\x03\x65\x62p\x10\x06\x12\x07\n\x03\x65si\x10\x07\x12\x07\n\x03\x65\x64i\x10\x08\x12\x07\n\x03\x65ip\x10\t\x12\x0b\n\x07\x66s_base\x10\n\x12\x0b\n\x07gs_base\x10\x0b\x12\x07\n\x03gtd\x10\x0c\x12\x07\n\x03ldt\x10\r\x12\t\n\x05mxcsr\x10\x0e\"\xe4\x03\n\x15\x41nnotated_Register_64\x12-\n\x04name\x18\x01 \x02(\x0e\x32\x1f.Annotated_Register_64.Register\x12\x14\n\x0cused_at_addr\x18\x02 \x02(\x03\x12\x18\n\x10used_at_addr_hex\x18\x03 \x01(\t\x12\x17\n\x05value\x18\x04 \x03(\x0b\x32\x08.Edge_64\x12-\n\x04\x66\x61\x63t\x18\x05 \x02(\x0b\x32\x1f.Annotated_Register_64.Property\x12\x1b\n\x13\x61\x62stract_expression\x18\x06 \x01(\t\x1a*\n\x08Property\x12\x0f\n\x07Unknown\x18\x01 \x02(\x08\x12\r\n\x05\x41live\x18\x02 \x01(\x08\"\xda\x01\n\x08Register\x12\x0b\n\x07Unknown\x10\x00\x12\x07\n\x03rax\x10\n\x12\x07\n\x03rcx\x10\x0b\x12\x07\n\x03rdx\x10\x0c\x12\x07\n\x03rbx\x10\r\x12\x07\n\x03rsp\x10\x0e\x12\x07\n\x03rbp\x10\x0f\x12\x07\n\x03rsi\x10\x10\x12\x07\n\x03rdi\x10\x11\x12\x07\n\x03rip\x10\x12\x12\x06\n\x02r8\x10\x13\x12\x06\n\x02r9\x10\x14\x12\x07\n\x03r10\x10\x15\x12\x07\n\x03r11\x10\x16\x12\x07\n\x03r12\x10\x17\x12\x07\n\x03r13\x10\x18\x12\x07\n\x03r14\x10\x19\x12\x07\n\x03r15\x10\x1a\x12\x0b\n\x07\x66s_base\x10\x1b\x12\x0b\n\x07gs_base\x10\x1c\x12\x07\n\x03gdt\x10\x1d\x12\x07\n\x03ldt\x10\x1e\"\x8d\x02\n\x12\x41nnotated_Function\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x15\n\rstart_at_addr\x18\x02 \x02(\x03\x12\x19\n\x11start_at_addr_hex\x18\x03 \x01(\t\x12\x13\n\x0b\x65nd_at_addr\x18\x04 \x01(\x03\x12\x17\n\x0f\x65nd_at_addr_hex\x18\x05 \x01(\t\x12&\n\x06prolog\x18\x06 \x03(\x0b\x32\x16.Annotated_Instruction\x12&\n\x06\x65pilog\x18\x07 \x03(\x0b\x32\x16.Annotated_Instruction\x12 \n\x0ereferered_from\x18\x08 \x03(\x0b\x32\x08.Edge_64\x12\x17\n\x05\x63\x61lls\x18\t \x03(\x0b\x32\x08.Edge_64\"\xdc\x01\n\x0b\x44isassembly\x12%\n\x05instr\x18\x01 \x03(\x0b\x32\x16.Annotated_Instruction\x12\x33\n\x0c\x62ranch_instr\x18\x02 \x03(\x0b\x32\x1d.Annotated_Branch_Instruction\x12&\n\x06reg_32\x18\x03 \x03(\x0b\x32\x16.Annotated_Register_32\x12&\n\x06reg_64\x18\x04 \x03(\x0b\x32\x16.Annotated_Register_64\x12!\n\x04\x66unc\x18\x05 \x03(\x0b\x32\x13.Annotated_Function')
 
 
 
@@ -59,8 +59,8 @@ _VARIABLE_TYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=996,
-  serialized_end=1030,
+  serialized_start=944,
+  serialized_end=978,
 )
 
 _VARIABLE_OTHERTYPE = _descriptor.EnumDescriptor(
@@ -80,8 +80,8 @@ _VARIABLE_OTHERTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=1032,
-  serialized_end=1065,
+  serialized_start=980,
+  serialized_end=1013,
 )
 
 _EXTERNALFUNCTION_CALLINGCONVENTION = _descriptor.EnumDescriptor(
@@ -109,8 +109,8 @@ _EXTERNALFUNCTION_CALLINGCONVENTION = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=1438,
-  serialized_end=1525,
+  serialized_start=1386,
+  serialized_end=1473,
 )
 
 _EDGE_64_KIND = _descriptor.EnumDescriptor(
@@ -134,8 +134,8 @@ _EDGE_64_KIND = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=2304,
-  serialized_end=2342,
+  serialized_start=2252,
+  serialized_end=2290,
 )
 
 _EDGE_32_KIND = _descriptor.EnumDescriptor(
@@ -159,8 +159,8 @@ _EDGE_32_KIND = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=2304,
-  serialized_end=2342,
+  serialized_start=2252,
+  serialized_end=2290,
 )
 
 _ANNOTATED_BRANCH_INSTRUCTION_BRANCH = _descriptor.EnumDescriptor(
@@ -272,8 +272,8 @@ _ANNOTATED_BRANCH_INSTRUCTION_BRANCH = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=2733,
-  serialized_end=2972,
+  serialized_start=2681,
+  serialized_end=2920,
 )
 
 _ANNOTATED_INSTRUCTION_OPERAND_OPERAND_TYPE = _descriptor.EnumDescriptor(
@@ -305,8 +305,8 @@ _ANNOTATED_INSTRUCTION_OPERAND_OPERAND_TYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=3334,
-  serialized_end=3415,
+  serialized_start=3282,
+  serialized_end=3363,
 )
 
 _ANNOTATED_REGISTER_32_REGISTER = _descriptor.EnumDescriptor(
@@ -378,8 +378,8 @@ _ANNOTATED_REGISTER_32_REGISTER = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=3684,
-  serialized_end=3843,
+  serialized_start=3632,
+  serialized_end=3791,
 )
 
 _ANNOTATED_REGISTER_64_REGISTER = _descriptor.EnumDescriptor(
@@ -479,8 +479,8 @@ _ANNOTATED_REGISTER_64_REGISTER = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=4112,
-  serialized_end=4330,
+  serialized_start=4060,
+  serialized_end=4278,
 )
 
 
@@ -815,21 +815,14 @@ _VARIABLE = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='type', full_name='Variable.type', index=2,
-      number=3, type=14, cpp_type=8, label=2,
-      has_default_value=False, default_value=0,
+      name='ida_type', full_name='Variable.ida_type', index=2,
+      number=3, type=9, cpp_type=9, label=2,
+      has_default_value=False, default_value=unicode("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='othertype', full_name='Variable.othertype', index=3,
-      number=4, type=14, cpp_type=8, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    _descriptor.FieldDescriptor(
-      name='inst_refs', full_name='Variable.inst_refs', index=4,
+      name='inst_refs', full_name='Variable.inst_refs', index=3,
       number=5, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -847,7 +840,7 @@ _VARIABLE = _descriptor.Descriptor(
   is_extendable=False,
   extension_ranges=[],
   serialized_start=853,
-  serialized_end=1065,
+  serialized_end=1013,
 )
 
 
@@ -881,8 +874,8 @@ _STACKVAR = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1067,
-  serialized_end=1120,
+  serialized_start=1015,
+  serialized_end=1068,
 )
 
 
@@ -930,8 +923,8 @@ _FUNCTION = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1122,
-  serialized_end=1230,
+  serialized_start=1070,
+  serialized_end=1178,
 )
 
 
@@ -1001,8 +994,8 @@ _EXTERNALFUNCTION = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1233,
-  serialized_end=1525,
+  serialized_start=1181,
+  serialized_end=1473,
 )
 
 
@@ -1043,8 +1036,8 @@ _EXTERNALDATA = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1527,
-  serialized_end=1598,
+  serialized_start=1475,
+  serialized_end=1546,
 )
 
 
@@ -1085,8 +1078,8 @@ _DATASYMBOL = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1600,
-  serialized_end=1676,
+  serialized_start=1548,
+  serialized_end=1624,
 )
 
 
@@ -1134,8 +1127,8 @@ _DATA = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1678,
-  serialized_end=1769,
+  serialized_start=1626,
+  serialized_end=1717,
 )
 
 
@@ -1176,8 +1169,8 @@ _ENTRYSYMBOLEXTRA = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1771,
-  serialized_end=1888,
+  serialized_start=1719,
+  serialized_end=1836,
 )
 
 
@@ -1218,8 +1211,8 @@ _ENTRYSYMBOL = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1890,
-  serialized_end=1986,
+  serialized_start=1838,
+  serialized_end=1934,
 )
 
 
@@ -1288,8 +1281,8 @@ _MODULE = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=1989,
-  serialized_end=2232,
+  serialized_start=1937,
+  serialized_end=2180,
 )
 
 
@@ -1331,8 +1324,8 @@ _EDGE_64 = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2234,
-  serialized_end=2342,
+  serialized_start=2182,
+  serialized_end=2290,
 )
 
 
@@ -1374,8 +1367,8 @@ _EDGE_32 = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2344,
-  serialized_end=2452,
+  serialized_start=2292,
+  serialized_end=2400,
 )
 
 
@@ -1452,8 +1445,8 @@ _ANNOTATED_BRANCH_INSTRUCTION = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2455,
-  serialized_end=2972,
+  serialized_start=2403,
+  serialized_end=2920,
 )
 
 
@@ -1495,8 +1488,8 @@ _ANNOTATED_INSTRUCTION_OPERAND = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3236,
-  serialized_end=3415,
+  serialized_start=3184,
+  serialized_end=3363,
 )
 
 _ANNOTATED_INSTRUCTION = _descriptor.Descriptor(
@@ -1578,8 +1571,8 @@ _ANNOTATED_INSTRUCTION = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=2975,
-  serialized_end=3415,
+  serialized_start=2923,
+  serialized_end=3363,
 )
 
 
@@ -1613,8 +1606,8 @@ _ANNOTATED_REGISTER_32_PROPERTY = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3639,
-  serialized_end=3681,
+  serialized_start=3587,
+  serialized_end=3629,
 )
 
 _ANNOTATED_REGISTER_32 = _descriptor.Descriptor(
@@ -1676,8 +1669,8 @@ _ANNOTATED_REGISTER_32 = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3418,
-  serialized_end=3843,
+  serialized_start=3366,
+  serialized_end=3791,
 )
 
 
@@ -1711,8 +1704,8 @@ _ANNOTATED_REGISTER_64_PROPERTY = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3639,
-  serialized_end=3681,
+  serialized_start=3587,
+  serialized_end=3629,
 )
 
 _ANNOTATED_REGISTER_64 = _descriptor.Descriptor(
@@ -1774,8 +1767,8 @@ _ANNOTATED_REGISTER_64 = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=3846,
-  serialized_end=4330,
+  serialized_start=3794,
+  serialized_end=4278,
 )
 
 
@@ -1858,8 +1851,8 @@ _ANNOTATED_FUNCTION = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=4333,
-  serialized_end=4602,
+  serialized_start=4281,
+  serialized_end=4550,
 )
 
 
@@ -1914,8 +1907,8 @@ _DISASSEMBLY = _descriptor.Descriptor(
   options=None,
   is_extendable=False,
   extension_ranges=[],
-  serialized_start=4605,
-  serialized_end=4825,
+  serialized_start=4553,
+  serialized_end=4773,
 )
 
 _INSTRUCTION.fields_by_name['imm_ref_type'].enum_type = _INSTRUCTION_REFTYPE
@@ -1924,8 +1917,6 @@ _INSTRUCTION.fields_by_name['jump_table'].message_type = _JUMPTBL
 _INSTRUCTION.fields_by_name['jump_index_table'].message_type = _JUMPINDEXTBL
 _INSTRUCTION_REFTYPE.containing_type = _INSTRUCTION;
 _BLOCK.fields_by_name['insts'].message_type = _INSTRUCTION
-_VARIABLE.fields_by_name['type'].enum_type = _VARIABLE_TYPE
-_VARIABLE.fields_by_name['othertype'].enum_type = _VARIABLE_OTHERTYPE
 _VARIABLE.fields_by_name['inst_refs'].message_type = _INSTRUCTION
 _VARIABLE_TYPE.containing_type = _VARIABLE;
 _VARIABLE_OTHERTYPE.containing_type = _VARIABLE;
