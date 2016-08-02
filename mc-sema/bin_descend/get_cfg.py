@@ -20,8 +20,6 @@ import traceback
 
 import itertools
 
-print sys.executable
-
 #hack for IDAPython to see google protobuf lib
 sys.path.append('/usr/lib/python2.7/dist-packages')
 import CFG_pb2
@@ -1304,8 +1302,25 @@ def getInstructionSize(ea):
     insn = idautils.DecodeInstruction(ea)
     return insn.size
 
+def recoverStackVars(M, F):
+    from var_recovery import collect_ida
+
+    # pull info from IDA
+    stack_locals = collect_ida.collect_func_vars(F) 
+    # jam into M
+    for (var_offset, var_name, var_size, var_flags) in stack_locals:
+        # mash
+        var = F.stackvars.add() 
+        var.sp_offset = var_offset
+        var.var.name = var_name
+        var.var.size = var_size
+        var.var.ida_type = var_flags
+
 def recoverFunctionFromSet(M, F, blockset, new_eas):
     processed_blocks = set()
+
+    # TODO predicated on cmd flag
+    recoverStackVars(M, F)
 
     while len(blockset) > 0:
         block = blockset.pop()
@@ -1455,7 +1470,7 @@ def preprocessBinary():
                         ACCESSED_VIA_JMP.add(fulladdr)
 
 
-def recoverCfg(to_recover, outf, exports_are_apis=False):
+def recoverCfg(to_recover, outf, exports_are_apis=False, stack_vars=False):
     M = CFG_pb2.Module()
     M.module_name = idc.GetInputFile()
     DEBUG("PROCESSING: {0}\n".format(M.module_name))
@@ -1826,11 +1841,6 @@ if __name__ == "__main__":
         EMAP = {}
         EMAP_DATA = {}
 
-        if args.stack_vars:
-            DEBUG("Attempting to recover stack variable information...")
-            from var_recovery import collect_ida
-            collect_ida.print_func_vars()
-
         if len(args.std_defs) > 0:
             for defsfile in args.std_defs:
                 DEBUG("Loading Standard Definitions file: {0}\n".format(defsfile.name))
@@ -1891,7 +1901,11 @@ if __name__ == "__main__":
 
         DEBUG("CFG Output File file: {0}\n".format(outf.name))
 
-        recoverCfg(eps, outf, args.exports_are_apis)
+        recoverCfg(eps, outf, args.exports_are_apis, args.stack_vars)
+
+        if args.stack_vars:
+            DEBUG("Attempting to recover stack variable information...")
+
     except:
         DEBUG(traceback.format_exc())
     
