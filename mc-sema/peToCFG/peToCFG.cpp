@@ -169,6 +169,12 @@ void NativeFunction::add_block(NativeBlockPtr b) {
     return;
 }
 
+void NativeFunction::add_stackvar(NativeStackVarPtr s) {
+    // TODO: add refs
+    this->stackvars.push_back(s);
+    return;
+}
+
 const llvm::Target *findDisTarget(string arch) {
     const llvm::Target  *tgt = NULL;
 
@@ -403,16 +409,34 @@ NativeBlockPtr  deserializeBlock( const ::Block   &block,
   return natB;
 }
 
+NativeStackVarPtr  deserializeStackVar( const ::StackVar &stackvar,
+                                        LLVMByteDecoder  &decoder)
+{
+  ::Variable var = stackvar.var();
+  NativeStackVarPtr natSV =
+    NativeStackVarPtr(new NativeStackVar(var.size(), var.name(), decoder.getPrinter(), stackvar.sp_offset()));
+
+  // TODO add refs
+
+  return natSV;
+}
+
 NativeFunctionPtr deserializeFunction(const ::Function  &func,
                                       LLVMByteDecoder   &decoder)
 {
   NativeFunctionPtr natF =
     NativeFunctionPtr(new NativeFunction(func.entry_address()));
 
-  //read all the blocks from this function
+  // read all the blocks from this function
   for(int i = 0; i < func.blocks_size(); i++)
   {
     natF->add_block(deserializeBlock(func.blocks(i), decoder));
+  }
+
+  // read any recovered function local variables from this function
+  for(int i = 0; i < func.stackvars_size(); i++)
+  {
+    natF->add_stackvar(deserializeStackVar(func.stackvars(i), decoder));
   }
 
   natF->compute_graph();
@@ -990,6 +1014,8 @@ static void funcFromNat(NativeFunctionPtr f, ::Function *fProto) {
     blockFromNatBlock(f->block_from_id(*vit), fProto->add_blocks());
     ++vit;
   }
+
+  // TODO add stack vars
 
   return;
 }
