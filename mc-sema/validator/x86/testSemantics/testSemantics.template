@@ -104,7 +104,7 @@ Function *initTestFunction(string testName, Module *M) {
                                                  F);
     assert(entryBlock != NULL);
 
-    allocateLocals(F, 32);
+    allocateRegisterLocals(F, 32);
     writeContextToLocals(entryBlock, 32, AllRegs);
 
     return F;

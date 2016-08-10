@@ -550,6 +550,35 @@ class NativeBlock {
 
 typedef boost::shared_ptr<NativeBlock> NativeBlockPtr;
 
+class NativeVar {
+    protected:
+    int64_t             size;
+    std::string         name;
+    std::list<InstPtr>  refs;
+    llvm::MCInstPrinter *MyPrinter;
+    public:
+    NativeVar(uint64_t size, std::string name, llvm::MCInstPrinter *printer) : size(size), name(name), MyPrinter(printer) {}
+    uint64_t get_size(void) { return this->size; }
+    void add_ref(InstPtr f) { this->refs.push_back(f); }
+    std::list<InstPtr> &get_refs(void) { return this->refs; }
+    std::string print_var(void);
+    std::string get_name(void) { return this->name; }
+    llvm::MCInstPrinter *get_printer(void) { return this->MyPrinter; }
+
+} ;
+
+typedef boost::shared_ptr<NativeVar> NativeVarPtr;
+
+class NativeStackVar : public NativeVar {
+    private:
+    uint64_t            offset;
+    public:
+    NativeStackVar(uint64_t size, std::string name, llvm::MCInstPrinter *printer, uint64_t offset) : NativeVar(size, name, printer) { this->offset = offset; }
+    uint64_t get_offset(void) { return this->offset; }
+};
+
+typedef boost::shared_ptr<NativeStackVar> NativeStackVarPtr;
+
 class NativeFunction {
  public:
   NativeFunction(VA b)
@@ -579,6 +608,8 @@ class NativeFunction {
   }
   std::string get_name(void);
   const std::string &get_symbol_name(void);
+    
+  void add_stackvar(NativeStackVarPtr);
  private:
   //a graph of blocks
   CFG *graph;
@@ -591,6 +622,9 @@ class NativeFunction {
   std::string funcSymName;
   //next available block ID
   uint64_t nextBlockID;
+  
+  //list of stack variables in this function
+  std::list<NativeStackVarPtr> stackvars;
 };
 
 typedef boost::shared_ptr<NativeBlock> NativeBlockPtr;

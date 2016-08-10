@@ -516,7 +516,7 @@ void win32AddCallValue(Module *mod) {
 
         // spill locals and get all registers from
         // struct.regs
-        allocateLocals(func_do_call_value, regWidth);
+        allocateRegisterLocals(func_do_call_value, regWidth);
         writeContextToLocals(main_block, regWidth, ABICallSpill);
 
         // create a pointer from the register value that would

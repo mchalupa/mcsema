@@ -877,7 +877,7 @@ static Instruction *GEPLocal(Type *Ty, const char *name, Instruction *I) {
 
 }  // namespace x86
 
-void allocateLocals(Function *F, int bits) {
+void allocateRegisterLocals(Function *F, int bits) {
   //always at the beginning of a function
   //we need to allocate local variables via alloca, these locals will
   //live for the life of the function context and be the sources/sinks
@@ -1174,6 +1174,15 @@ void allocateLocals(Function *F, int bits) {
   return;
 }
 
+//
+// Allocate any function stack local variables.
+//
+void allocateStackLocals(Function *F, NativeFunctionPtr func) {
+  //always at the beginning of a function
+
+  return;
+}
+
 BasicBlock *bbFromStrName(string n, Function *F) {
   BasicBlock *found = nullptr;
 
@@ -1356,7 +1365,15 @@ static bool insertFunctionIntoModule(NativeModulePtr mod,
   BasicBlock *entryBlock = BasicBlock::Create(F->getContext(), "entry", F);
   TASSERT(entryBlock != nullptr, "");
 
-  allocateLocals(F, ArchPointerSize(M));
+  allocateRegisterLocals(F, ArchPointerSize(M));
+  //and at the beginning of the function, we spill all the context
+
+  writeContextToLocals(entryBlock, ArchPointerSize(M), ABICallSpill);
+  //writeContextToLocals(entryBlock, 32, AllRegs);
+
+  // allocate any function local variables recovered
+  // TODO: only allocates. right now they aren't hooked up to anything.
+  allocateStackLocals(F, func);
 
   //then we put an unconditional branch from the 'entry' block to the first
   //block, and we create the first block
