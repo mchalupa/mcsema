@@ -566,7 +566,7 @@ void allocateRegisterLocals(Function *F, int bits) {
 //
 void allocateStackLocals(Function *F, NativeFunctionPtr func) {
   //always at the beginning of a function
-
+  // TODO
   return;
 }
 

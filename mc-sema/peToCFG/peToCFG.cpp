@@ -148,6 +148,12 @@ string NativeBlock::print_block(void) {
     return s;
 }
 
+string NativeVar::print_var(void) {
+    string                  s;
+    s = this->name;
+    return s;
+}
+
 void NativeBlock::add_inst(InstPtr p) {
     this->instructions.push_back(p);
     return;
