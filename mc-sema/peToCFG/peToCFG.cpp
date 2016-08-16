@@ -419,8 +419,10 @@ NativeStackVarPtr  deserializeStackVar( const ::StackVar &stackvar,
                                         LLVMByteDecoder  &decoder)
 {
   ::Variable var = stackvar.var();
+  // TODO something to figure out types. for now we just pass through the
+  // ida_type. that code belongs in/after get_cfg, before we get to here.
   NativeStackVarPtr natSV =
-    NativeStackVarPtr(new NativeStackVar(var.size(), var.name(), decoder.getPrinter(), stackvar.sp_offset()));
+    NativeStackVarPtr(new NativeStackVar(var.size(), var.name(), var.ida_type(), decoder.getPrinter(), stackvar.sp_offset()));
 
   // TODO add refs
 
