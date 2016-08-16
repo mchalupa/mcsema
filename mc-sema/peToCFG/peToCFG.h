@@ -531,6 +531,7 @@ class NativeFunction {
     NativeFunction(VA b) : funcEntryVA(b), nextBlockID(0), graph(nullptr) { }
     void add_block(NativeBlockPtr);
     void add_stackvar(NativeStackVarPtr);
+    std::list<NativeStackVarPtr> get_stackvars(void) { return this->stackvars; }
     VA get_start(void) { return this->funcEntryVA; }
     uint64_t num_blocks(void) { return this->IDtoBlock.size(); }
     NativeBlockPtr block_from_id(uint64_t);
