@@ -1179,7 +1179,37 @@ void allocateRegisterLocals(Function *F, int bits) {
 //
 void allocateStackLocals(Function *F, NativeFunctionPtr func) {
   //always at the beginning of a function
-  // TODO
+  //need to allocate local variables via alloca
+  //using sizes recovered...
+  BasicBlock *begin = &F->getEntryBlock();
+  Instruction *cur = begin->getFirstNonPHI();
+  std::list<NativeStackVarPtr> stackvars = func->get_stackvars();
+  Type *t;
+  for(std::list<NativeStackVarPtr>::iterator sv = stackvars.begin(); sv != stackvars.end(); ++sv)
+  {
+    // form type
+    // TODO just ints for now...
+    switch((*sv)->get_size())
+    {
+      t = NULL; // debugging; probably should choose a better failure value
+      case 1:
+        t = Type::getInt8Ty(F->getContext());
+        break;
+      case 2:
+        t = Type::getInt16Ty(F->getContext());
+        break;
+      case 4:
+        t = Type::getInt32Ty(F->getContext());
+        break;
+      default:
+        // ignore this one
+        continue;
+    }
+    // alloca
+    cout << "Inserting var " << (*sv)->get_name() << ", size " << (*sv)->get_size() << std::endl;
+    Instruction *v = new AllocaInst(t, (*sv)->get_name(), cur);
+    cur = v;
+  }
   return;
 }
 

@@ -610,6 +610,7 @@ class NativeFunction {
   const std::string &get_symbol_name(void);
     
   void add_stackvar(NativeStackVarPtr);
+  std::list<NativeStackVarPtr> get_stackvars(void) { return this->stackvars; }
  private:
   //a graph of blocks
   CFG *graph;
