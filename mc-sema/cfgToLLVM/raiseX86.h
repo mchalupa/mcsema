@@ -540,7 +540,7 @@ void F_SET(llvm::BasicBlock *b, MCSemaRegs flag);
 
 void F_CLEAR(llvm::BasicBlock *b, MCSemaRegs flag);
 
-void allocateLocals(llvm::Function *, int);
+void allocateRegisterLocals(llvm::Function *, int);
 
 llvm::BasicBlock *bbFromStrName(std::string, llvm::Function *);
 
