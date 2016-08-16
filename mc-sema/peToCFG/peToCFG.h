@@ -554,15 +554,17 @@ class NativeVar {
     protected:
     int64_t             size;
     std::string         name;
+    std::string         type; // TODO: something cleverer than string. for now it's just ida_type wholesale.
     std::list<InstPtr>  refs;
     llvm::MCInstPrinter *MyPrinter;
     public:
-    NativeVar(uint64_t size, std::string name, llvm::MCInstPrinter *printer) : size(size), name(name), MyPrinter(printer) {}
+    NativeVar(uint64_t size, std::string name, std::string type, llvm::MCInstPrinter *printer) : size(size), name(name), type(type), MyPrinter(printer) {}
     uint64_t get_size(void) { return this->size; }
     void add_ref(InstPtr f) { this->refs.push_back(f); }
     std::list<InstPtr> &get_refs(void) { return this->refs; }
     std::string print_var(void);
     std::string get_name(void) { return this->name; }
+    std::string get_type(void) { return this->type; }
     llvm::MCInstPrinter *get_printer(void) { return this->MyPrinter; }
 
 } ;
@@ -573,7 +575,7 @@ class NativeStackVar : public NativeVar {
     private:
     uint64_t            offset;
     public:
-    NativeStackVar(uint64_t size, std::string name, llvm::MCInstPrinter *printer, uint64_t offset) : NativeVar(size, name, printer) { this->offset = offset; }
+    NativeStackVar(uint64_t size, std::string name, std::string type, llvm::MCInstPrinter *printer, uint64_t offset) : NativeVar(size, name, type, printer) { this->offset = offset; }
     uint64_t get_offset(void) { return this->offset; }
 };
 
