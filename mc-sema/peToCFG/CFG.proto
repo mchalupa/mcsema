@@ -59,16 +59,6 @@ message Block {
 
 message Variable {
 
-    // not sure this is what we want here, just throwing it in for now
-    enum Type {
-        Int = 0;
-        Ptr = 1;
-        Char = 2;
-    }
-    enum OtherType {
-        Array = 0;
-        Struc = 1;
-    }
     // not sure this is what we want here, just throwing it in for now 
     //enum Type {
     //    Int = 0;
