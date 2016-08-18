@@ -737,6 +737,7 @@ static InstTransResult translate_JMPm(NativeModulePtr natM, BasicBlock *& block,
         return ret;
     }
   } else if (ip->has_ext_data_ref()) {
+<<<<<<< HEAD
     Module *M = block->getParent()->getParent();
 
     std::string target = ip->get_ext_data_ref()->getSymbolName();
@@ -750,6 +751,21 @@ static InstTransResult translate_JMPm(NativeModulePtr natM, BasicBlock *& block,
     doCallM<width>(block, ip, addrInt, true);
     llvm::ReturnInst::Create(block->getContext(), block);
     return EndBlock;
+=======
+      Module *M = block->getParent()->getParent();
+
+      std::string target = ip->get_ext_data_ref()->getSymbolName();
+      llvm::Value *gvar = M->getGlobalVariable(target);
+
+      TASSERT(gvar != NULL, "Could not find data ref: " + target);
+
+      Value *addrInt = new llvm::PtrToIntInst(
+            gvar, llvm::Type::getIntNTy(block->getContext(), width), "", block);
+
+      doCallM<width>(block, ip, addrInt);
+      // clear stack
+      return doRet<width>(block);
+>>>>>>> handle jump via memory bettere
 
   } else if (ip->has_jump_table() && ip->has_mem_reference) {
     // this is a jump table that got converted
@@ -765,6 +781,7 @@ static InstTransResult translate_JMPm(NativeModulePtr natM, BasicBlock *& block,
     return EndBlock;
 
   } else if (ip->has_mem_reference) {
+<<<<<<< HEAD
     doCallM<width>(block, ip, MEM_REFERENCE(0), true);
     llvm::ReturnInst::Create(block->getContext(), block);
     return EndBlock;
@@ -773,6 +790,16 @@ static InstTransResult translate_JMPm(NativeModulePtr natM, BasicBlock *& block,
     doCallM<width>(block, ip, ADDR_NOREF(0), true);
     llvm::ReturnInst::Create(block->getContext(), block);
     return EndBlock;
+=======
+    doCallM<width>(block, ip, MEM_REFERENCE(0));
+    // clear stack
+    return doRet<width>(block);
+  } else {
+    // normal jump by memory (e.g. jmp [reg+offset] )
+    doCallM<width>(block, ip, ADDR_NOREF(0));
+    // clear stack
+    return doRet<width>(block);
+>>>>>>> handle jump via memory bettere
   }
 }
 
