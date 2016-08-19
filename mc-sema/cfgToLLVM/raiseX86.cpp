@@ -272,7 +272,7 @@ void F_CLEAR(BasicBlock *b, MCSemaRegs flag) {
 // some instructions, like inc and dec, do not need to do this
 //
 
-void allocateLocals(Function *F, int bits) {
+void allocateRegisterLocals(Function *F, int bits) {
   //always at the beginning of a function
   //we need to allocate local variables via alloca, these locals will
   //live for the life of the function context and be the sources/sinks
@@ -561,6 +561,45 @@ void allocateLocals(Function *F, int bits) {
   return;
 }
 
+//
+// Allocate any function stack local variables.
+//
+void allocateStackLocals(Function *F, NativeFunctionPtr func) {
+  //always at the beginning of a function
+  //need to allocate local variables via alloca
+  //using sizes recovered...
+  BasicBlock *begin = &F->getEntryBlock();
+  Instruction *cur = begin->getFirstNonPHI();
+  std::list<NativeStackVarPtr> stackvars = func->get_stackvars();
+  Type *t;
+  for(std::list<NativeStackVarPtr>::iterator sv = stackvars.begin(); sv != stackvars.end(); ++sv)
+  {
+    // form type
+    // TODO just ints for now...
+    switch((*sv)->get_size())
+    {
+      t = NULL; // debugging; probably should choose a better failure value
+      case 1:
+        t = Type::getInt8Ty(F->getContext());
+        break;
+      case 2:
+        t = Type::getInt16Ty(F->getContext());
+        break;
+      case 4:
+        t = Type::getInt32Ty(F->getContext());
+        break;
+      default:
+        // ignore this one
+        continue;
+    }
+    // alloca
+    cout << "Inserting var " << (*sv)->get_name() << ", size " << (*sv)->get_size() << std::endl;
+    Instruction *v = new AllocaInst(t, (*sv)->get_name(), cur);
+    cur = v;
+  }
+  return;
+}
+
 BasicBlock *bbFromStrName(string n, Function *F) {
   BasicBlock *found = NULL;
 
@@ -699,11 +738,15 @@ static bool insertFunctionIntoModule(NativeModulePtr mod,
   BasicBlock *entryBlock = BasicBlock::Create(F->getContext(), "entry", F);
   TASSERT(entryBlock != NULL, "");
 
-  allocateLocals(F, getPointerSize(M));
+  allocateRegisterLocals(F, getPointerSize(M));
   //and at the beginning of the function, we spill all the context
 
   writeContextToLocals(entryBlock, getPointerSize(M), ABICallSpill);
   //writeContextToLocals(entryBlock, 32, AllRegs);
+
+  // allocate any function local variables recovered
+  // TODO: only allocates. right now they aren't hooked up to anything.
+  allocateStackLocals(F, func);
 
   //then we put an unconditional branch from the 'entry' block to the first
   //block, and we create the first block
@@ -1041,8 +1084,8 @@ static Constant* makeConstantBlob(LLVMContext &ctx,
                                   const vector<uint8_t> &blob) {
 
   Type *charTy = Type::getInt8Ty(ctx);
-  cout << blob.size() << "\n";
-  cout.flush();
+  //cout << blob.size() << "\n";
+  //cout.flush();
   ArrayType *arrT = ArrayType::get(charTy, blob.size());
   vector<uint8_t>::const_iterator it = blob.begin();
   vector<Constant*> array_elements;
@@ -1080,6 +1123,30 @@ static GlobalVariable* getSectionForDataAddr(const list<DataSection> &dataSecs,
 
 }
 
+static Constant* getPtrSizedValue(Module *M, Constant *v, int valsize) {
+        Constant *final_val = v;
+
+        //if(getPointerSize(M) == Pointer32) {
+        //    TASSERT( valsize == 4, "Invalid size of pointer ref")
+        //} else  if(getPointerSize(M) == Pointer64) {
+        //    TASSERT( valsize == 8, "Invalid size of pointer ref")
+        //}
+
+        // 
+        // this sometimes doesn't work since LLVM assembler is broken :(
+        //
+        if ( (getPointerSize(M) == Pointer32 && valsize == 4) ||
+                (getPointerSize(M) == Pointer64 && valsize == 8) ) {
+            final_val = v;
+        } else if (getPointerSize(M) == Pointer64 && valsize == 4)  {
+          Constant *int_val = ConstantExpr::getPtrToInt(
+              v, Type::getInt64Ty(M->getContext()));
+          final_val = ConstantExpr::getTrunc(int_val, Type::getInt32Ty(M->getContext()));
+        }
+
+        return final_val;
+}
+
 void dataSectionToTypesContents(const list<DataSection> &globaldata,
                                 DataSection& ds, Module *M,
                                 vector<Constant*>& secContents,
@@ -1105,13 +1172,36 @@ void dataSectionToTypesContents(const list<DataSection> &globaldata,
   for (list<DataSectionEntry>::const_iterator dsec_itr = ds_entries.begin();
       dsec_itr != ds_entries.end(); dsec_itr++) {
     string sym_name;
-    cout << __FUNCTION__ << " : " << to_string<VA>(dsec_itr->getBase(), hex)
-         << " " << to_string<VA>(dsec_itr->getSize(), hex) << "\n";
+
     if (dsec_itr->getSymbol(sym_name)) {
       const char *func_addr_str = sym_name.c_str() + 4;
       VA func_addr = strtol(func_addr_str, NULL, 16);
 
-      if (sym_name.find("sub_") == 0) {
+      cout << __FUNCTION__ << ": Found symbol: " << sym_name << "\n";
+
+      if (sym_name.find("ext_") == 0) {
+
+        Constant *final_val  = nullptr;
+
+        GlobalVariable *ext_v = M->getNamedGlobal(func_addr_str);
+
+        if(ext_v != nullptr && isa<Function>(ext_v)) {
+            final_val = getPtrSizedValue(M, ext_v, dsec_itr->getSize());
+            //cout << "External function" << sym_name << " has type: " << final_val->getType() << "\n";
+        } else if(ext_v != nullptr) {
+            final_val = getPtrSizedValue(M, ext_v, dsec_itr->getSize());
+            //cout << "External data" << sym_name << " has type: " << final_val->getType() << "\n";
+            // assume ext data
+        } else {
+            TASSERT(ext_v != nullptr, "Could not find external: " + sym_name);
+            //cout << "External fail" << sym_name << " has type: " << final_val->getType() << "\n";
+        }
+
+
+        secContents.push_back(final_val);
+        data_section_types.push_back(final_val->getType());
+
+      } else if (sym_name.find("sub_") == 0) {
         // add function pointer to data section
         // to do this, create a callback driver for
         // it first (since it may be called externally)
@@ -1127,8 +1217,9 @@ void dataSectionToTypesContents(const list<DataSection> &globaldata,
           TASSERT(func != NULL, "Could not find function: " + sym_name);
         }
 
-        secContents.push_back(func);
-        data_section_types.push_back(func->getType());
+        Constant *final_val = getPtrSizedValue(M, func, dsec_itr->getSize());
+        secContents.push_back(final_val);
+        data_section_types.push_back(final_val->getType());
 
       } else {
         // data symbol
@@ -1146,10 +1237,10 @@ void dataSectionToTypesContents(const list<DataSection> &globaldata,
         // to the new data section pointer
         VA addr_diff = func_addr - section_base;
         Constant *final_val;
-        cout << " Symbol name : " << string(func_addr_str) << " : "
-             << to_string<VA>(func_addr, hex) << " : "
-             << to_string<VA>(section_base, hex) << "\n";
-        cout.flush();
+        //cout << " Symbol name : " << string(func_addr_str) << " : "
+        //     << to_string<VA>(func_addr, hex) << " : "
+        //     << to_string<VA>(section_base, hex) << "\n";
+        //cout.flush();
         if (getPointerSize(M) == Pointer32) {
           Constant *int_val = ConstantExpr::getPtrToInt(
               g_ref, Type::getInt32Ty(M->getContext()));
@@ -1284,9 +1375,6 @@ bool natModToModule(NativeModulePtr natMod, Module *M, raw_ostream &report) {
     ++i;
   }
 
-  // insert data after functions -- data may have function references
-  insertDataSections(natMod, M, report);
-
   list<ExternalDataRefPtr> extDataRefs = natMod->getExtDataRefs();
   list<ExternalDataRefPtr>::iterator data_it = extDataRefs.begin();
 
@@ -1294,12 +1382,13 @@ bool natModToModule(NativeModulePtr natMod, Module *M, raw_ostream &report) {
     ExternalDataRefPtr dr = *data_it;
     int dsize = dr->getDataSize();
     std::string symname = dr->getSymbolName();
-    if (dsize > 16) {
-      throw TErr(__LINE__, __FILE__, "Unsupported external data size!");
-    }
+    //if (dsize > 16) {
+    //  throw TErr(__LINE__, __FILE__, "Unsupported external data size!");
+    //}
 
-    // for now, just use integer types
-    Type *extType = Type::getIntNTy(M->getContext(), dsize * 8);
+    //Type *extType = Type::getIntNTy(M->getContext(), dsize * 8);
+    Type *extType = ArrayType::get(Type::getInt8Ty(M->getContext()), 
+            dsize);
 
     GlobalValue *gv = dyn_cast<GlobalValue>(
         M->getOrInsertGlobal(symname, extType));
@@ -1389,14 +1478,20 @@ bool natModToModule(NativeModulePtr natMod, Module *M, raw_ostream &report) {
       }
     }
   }
+
+  // insert data after functions -- data may have function references
+  insertDataSections(natMod, M, report);
+
   // populate functions
   i = funcs.begin();
   while (i != funcs.end()) {
     NativeFunctionPtr f = *i;
 
     if (insertFunctionIntoModule(natMod, f, M) == false) {
-      result = false;
-      break;
+        std::string fname = f->get_name();
+        cerr << "Could not insert function: " << fname << " into the LLVM module\n";
+        result = false;
+        break;
     }
     ++i;
   }

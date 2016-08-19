@@ -134,6 +134,16 @@ class Inst {
         GSPrefix
     };
 
+    enum CFGRefType {
+        CFGCodeRef,
+        CFGDataRef
+    };
+
+    enum CFGOpType {
+        IMMRef,
+        MEMRef
+    };
+
     private:
     std::vector<VA>   targets;
     std::vector<uint8_t> instBytes;
@@ -154,15 +164,28 @@ class Inst {
     bool            ext_call_target;
     bool            ext_data_ref;
     bool            is_call_external;
-    uint32_t data_offset;
-    bool            has_data_offset;
     uint8_t         len;
     bool            is_terminator;
+
+
     // relocation offset: the number of bytes from the start of the instruction
     // that there is a relocation.
     // Zero if there is no relocation that occurs in the bytes of this
     // instruction
-    uint8_t         reloc_offset;
+    uint64_t        imm_reloc_offset;
+    uint64_t        imm_reference;
+    CFGRefType      imm_ref_type;
+public:
+    bool            has_imm_reference;
+private:
+
+    uint64_t        mem_reloc_offset;
+    uint64_t        mem_reference;
+    CFGRefType      mem_ref_type;
+public:
+    bool            has_mem_reference;
+private:
+
     uint32_t        arch;
     //  if this instruction is a system call, its system call number
     //  otherwise, -1
@@ -198,23 +221,104 @@ class Inst {
         return this->local_noreturn;
     }
 
-    uint8_t get_reloc_offset() {
-        return this->reloc_offset;
+    uint8_t get_reloc_offset(CFGOpType op) {
+        if(op == MEMRef) {
+            return this->mem_reloc_offset;
+        } else if (op == IMMRef) {
+            return this->imm_reloc_offset;
+        } else {
+            return -1;
+        }
     }
 
-    void set_reloc_offset(uint8_t ro) {
-        this->reloc_offset = ro;
+    void set_reloc_offset(CFGOpType op, uint8_t ro) {
+        if(op == MEMRef) {
+            this->mem_reloc_offset = ro;
+        } else if (op == IMMRef) {
+            this->imm_reloc_offset = ro;
+        } else {
+            //
+        }
     }
 
-    void set_data_offset(uint32_t d) {
-        this->has_data_offset = true;
-        this->data_offset = d;
-        return;
+    void set_reference(CFGOpType op, uint64_t ref) {
+        if(op == MEMRef) {
+            this->mem_reference = ref;
+            this->has_mem_reference = true;
+        } else if (op == IMMRef) {
+            this->imm_reference = ref;
+            this->has_imm_reference = true;
+        } else {
+            // void
+        }
     }
 
-    bool is_data_offset(void) { return this->has_data_offset; }
+    void set_ref_type(CFGOpType op, CFGRefType rt) {
+        if(op == MEMRef) {
+            this->mem_ref_type = rt;
+        } else if (op == IMMRef) {
+            this->imm_ref_type = rt;
+        } else {
+            // void
+        }
+    }
 
-    uint32_t get_data_offset(void) { return this->data_offset; }
+    void set_ref_reloc_type(CFGOpType op, uint64_t ref, uint64_t ro, CFGRefType rt)
+    {
+        const char *ops = op == MEMRef ? "MEM" : "IMM";
+        const char *rts = rt == CFGCodeRef ? "CODE" : "DATA";
+
+        std::cout << __FUNCTION__ << ": Adding  ref: " << ops << ", to: " << std::hex << ref << ", ro: " << ro << ", rt: " << rts << std::endl;
+        this->set_reference(op, ref);
+        this->set_reloc_offset(op, ro);
+        this->set_ref_type(op, rt);
+    }
+
+    bool has_reference(CFGOpType op) {
+        if(op == MEMRef) {
+            return this->has_mem_reference;
+        } else if (op == IMMRef) {
+            return this->has_imm_reference;
+        } else {
+            return false;
+        }
+    }
+
+    uint64_t get_reference(CFGOpType op) {
+        if(op == MEMRef) {
+            return this->mem_reference;
+        } else if (op == IMMRef) {
+            return this->imm_reference;
+        } else {
+            return -1;
+        }
+    }
+
+    CFGRefType get_ref_type(CFGOpType op) {
+        if(op == MEMRef) {
+            return this->mem_ref_type;
+        } else if (op == IMMRef) {
+            return this->imm_ref_type;
+        } else {
+            //TODO throw exception?
+            //return -1;
+            return this->mem_ref_type;
+        }
+    }
+
+
+    bool has_code_ref() {
+        if(this->has_mem_reference && this->mem_ref_type == CFGCodeRef) {
+            return true;
+        }
+
+        if(this->has_imm_reference && this->imm_ref_type == CFGCodeRef) {
+            return true;
+        }
+
+        return false;
+    }
+
 
     bool get_is_call_external(void) { return this->is_call_external; }
     void set_is_call_external(void) { this->is_call_external = true; }
@@ -338,16 +442,21 @@ class Inst {
         pfx(k),
         ext_call_target(false),
         is_call_external(false),
-        has_data_offset(false),
         is_terminator(false),
+        imm_reloc_offset(0),
+        imm_reference(0),
+        imm_ref_type(CFGDataRef),
+        has_imm_reference(false),
+        mem_reloc_offset(0),
+        mem_reference(0),
+        mem_ref_type(CFGDataRef),
+        has_mem_reference(false),
         len(l),
-        reloc_offset(0),
         jump_table(false),
         jump_index_table(false),
         ext_data_ref(false),
         system_call_number(-1),
         local_noreturn(false),
-        data_offset(0),
 		hasRIP(false),
 		rip_target(0)
        { }
@@ -388,10 +497,41 @@ class NativeBlock {
 
 typedef boost::shared_ptr<NativeBlock> NativeBlockPtr;
 
+class NativeVar {
+    protected:
+    int64_t             size;
+    std::string         name;
+    std::list<InstPtr>  refs;
+    llvm::MCInstPrinter *MyPrinter;
+    public:
+    NativeVar(uint64_t size, std::string name, llvm::MCInstPrinter *printer) : size(size), name(name), MyPrinter(printer) {}
+    uint64_t get_size(void) { return this->size; }
+    void add_ref(InstPtr f) { this->refs.push_back(f); }
+    std::list<InstPtr> &get_refs(void) { return this->refs; }
+    std::string print_var(void);
+    std::string get_name(void) { return this->name; }
+    llvm::MCInstPrinter *get_printer(void) { return this->MyPrinter; }
+
+} ;
+
+typedef boost::shared_ptr<NativeVar> NativeVarPtr;
+
+class NativeStackVar : public NativeVar {
+    private:
+    uint64_t            offset;
+    public:
+    NativeStackVar(uint64_t size, std::string name, llvm::MCInstPrinter *printer, uint64_t offset) : NativeVar(size, name, printer) { this->offset = offset; }
+    uint64_t get_offset(void) { return this->offset; }
+};
+
+typedef boost::shared_ptr<NativeStackVar> NativeStackVarPtr;
+
 class NativeFunction {
     public:
     NativeFunction(VA b) : funcEntryVA(b), nextBlockID(0), graph(nullptr) { }
-    void add_block(NativeBlockPtr );
+    void add_block(NativeBlockPtr);
+    void add_stackvar(NativeStackVarPtr);
+    std::list<NativeStackVarPtr> get_stackvars(void) { return this->stackvars; }
     VA get_start(void) { return this->funcEntryVA; }
     uint64_t num_blocks(void) { return this->IDtoBlock.size(); }
     NativeBlockPtr block_from_id(uint64_t);
@@ -411,6 +551,8 @@ class NativeFunction {
     VA                          funcEntryVA;
     //next available block ID
     uint64_t                    nextBlockID;
+    //list of stack variables in this function
+    std::list<NativeStackVarPtr> stackvars;
 };
 
 typedef boost::shared_ptr<NativeBlock>            NativeBlockPtr;

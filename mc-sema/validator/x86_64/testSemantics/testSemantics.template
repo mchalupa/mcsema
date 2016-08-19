@@ -118,10 +118,10 @@ Function *initTestFunction(string testName, Module *M) {
     assert(entryBlock != NULL);
 
     if(getPointerSize(M) == Pointer32){
-        allocateLocals(F, 32);
+        allocateRegisterLocals(F, 32);
         writeContextToLocals(entryBlock, 32, AllRegs);
     } else {
-        allocateLocals(F, 64);
+        allocateRegisterLocals(F, 64);
         writeContextToLocals(entryBlock, 64, AllRegs);
     }
 

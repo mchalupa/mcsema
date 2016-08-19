@@ -148,6 +148,12 @@ string NativeBlock::print_block(void) {
     return s;
 }
 
+string NativeVar::print_var(void) {
+    string                  s;
+    s = this->name;
+    return s;
+}
+
 void NativeBlock::add_inst(InstPtr p) {
     this->instructions.push_back(p);
     return;
@@ -166,6 +172,12 @@ void NativeFunction::add_block(NativeBlockPtr b) {
     this->baseToID[blockBase] = curBlockID;
     this->IDtoBlock[curBlockID] = b;
 
+    return;
+}
+
+void NativeFunction::add_stackvar(NativeStackVarPtr s) {
+    // TODO: add refs
+    this->stackvars.push_back(s);
     return;
 }
 
@@ -268,6 +280,19 @@ void NativeModule::addDataSection(const DataSection &d)
     this->dataSecs.push_back(d);
 }
 
+Inst::CFGRefType deserRefType(::Instruction::RefType k)
+{
+  switch(k)
+  {
+      case ::Instruction::CodeRef:
+          return Inst::CFGCodeRef;
+      case ::Instruction::DataRef:
+          return Inst::CFGDataRef;
+    default:
+      throw LErr(__LINE__, __FILE__, "Unsupported Ref Type");
+  }
+}
+
 InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder)
 {
   VA                      addr = inst.inst_addr();
@@ -287,9 +312,6 @@ InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder)
   if(fa_tgt > 0)
     ip->set_fa(fa_tgt);
 
-  if(inst.has_data_offset())
-    ip->set_data_offset(inst.data_offset());
-
   if(inst.has_ext_call_name())
   {
     ExternalCodeRefPtr p(new ExternalCodeRef(inst.ext_call_name()));
@@ -302,13 +324,36 @@ InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder)
     ip->set_ext_data_ref(p);
   }
 
-  if(inst.has_call_target())
-  {
-      ip->set_call_tgt(inst.call_target());
+  if(inst.has_imm_reference()) {
+      uint64_t ref = inst.imm_reference();
+      uint64_t ro = 0;
+      Inst::CFGRefType rt;
+
+      if(inst.has_imm_reloc_offset()) {
+          ro = inst.imm_reloc_offset();
+      }
+
+      if(inst.has_imm_ref_type()) {
+          rt = deserRefType(inst.imm_ref_type());
+      }
+
+      ip->set_ref_reloc_type(Inst::IMMRef, ref, ro, rt);
   }
 
-  if(inst.has_reloc_offset()) {
-      ip->set_reloc_offset(inst.reloc_offset());
+  if(inst.has_mem_reference()) {
+      uint64_t ref = inst.mem_reference();
+      uint64_t ro = 0;
+      Inst::CFGRefType rt;
+
+      if(inst.has_mem_reloc_offset()) {
+          ro = inst.mem_reloc_offset();
+      }
+
+      if(inst.has_mem_ref_type()) {
+          rt = deserRefType(inst.mem_ref_type());
+      }
+
+      ip->set_ref_reloc_type(Inst::MEMRef, ref, ro, rt);
   }
 
   if(inst.has_jump_table()) {
@@ -370,16 +415,34 @@ NativeBlockPtr  deserializeBlock( const ::Block   &block,
   return natB;
 }
 
+NativeStackVarPtr  deserializeStackVar( const ::StackVar &stackvar,
+                                        LLVMByteDecoder  &decoder)
+{
+  ::Variable var = stackvar.var();
+  NativeStackVarPtr natSV =
+    NativeStackVarPtr(new NativeStackVar(var.size(), var.name(), decoder.getPrinter(), stackvar.sp_offset()));
+
+  // TODO add refs
+
+  return natSV;
+}
+
 NativeFunctionPtr deserializeFunction(const ::Function  &func,
                                       LLVMByteDecoder   &decoder)
 {
   NativeFunctionPtr natF =
     NativeFunctionPtr(new NativeFunction(func.entry_address()));
 
-  //read all the blocks from this function
+  // read all the blocks from this function
   for(int i = 0; i < func.blocks_size(); i++)
   {
     natF->add_block(deserializeBlock(func.blocks(i), decoder));
+  }
+
+  // read any recovered function local variables from this function
+  for(int i = 0; i < func.stackvars_size(); i++)
+  {
+    natF->add_stackvar(deserializeStackVar(func.stackvars(i), decoder));
   }
 
   natF->compute_graph();
@@ -818,10 +881,6 @@ static void instFromNatInst(InstPtr i, ::Instruction *protoInst) {
 
   protoInst->set_inst_len(i->get_len());
 
-  if(i->is_data_offset()) {
-    protoInst->set_data_offset(i->get_data_offset());
-  }
-
   if(i->has_ext_call_target()) {
     string  s = i->get_ext_call_target()->getSymbolName();
     protoInst->set_ext_call_name(s);
@@ -832,12 +891,6 @@ static void instFromNatInst(InstPtr i, ::Instruction *protoInst) {
     string  s = i->get_ext_data_ref()->getSymbolName();
     protoInst->set_ext_data_name(s);
   }
-
-  if(i->has_call_tgt()) {
-      protoInst->set_call_target(i->get_call_tgt(0));
-  }
-
-  protoInst->set_reloc_offset(i->get_reloc_offset());
 
   if(i->has_jump_table()) {
       MCSJumpTablePtr native_jmp = i->get_jump_table();
@@ -968,6 +1021,8 @@ static void funcFromNat(NativeFunctionPtr f, ::Function *fProto) {
     ++vit;
   }
 
+  // TODO add stack vars
+
   return;
 }
 
@@ -990,7 +1045,7 @@ static void dumpData(DataSection &d, ::Data *protoData)
         ds->set_base_address(deitr->getBase());
         ds->set_symbol_name(sym_name);
 		ds->set_symbol_size(deitr->getSize());
-		printf("dumpData : base %x, size, %d\n", deitr->getBase(), deitr->getSize());
+		printf("dumpData : base %lx, size, %ld\n", deitr->getBase(), deitr->getSize());
     }
   }
 

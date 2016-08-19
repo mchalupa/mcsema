@@ -36,6 +36,8 @@ class JumpTbl;
 class JumpIndexTbl;
 class Instruction;
 class Block;
+class Variable;
+class StackVar;
 class Function;
 class ExternalFunction;
 class ExternalData;
@@ -56,6 +58,25 @@ class Annotated_Register_64_Property;
 class Annotated_Function;
 class Disassembly;
 
+enum Instruction_RefType {
+  Instruction_RefType_CodeRef = 0,
+  Instruction_RefType_DataRef = 1
+};
+bool Instruction_RefType_IsValid(int value);
+const Instruction_RefType Instruction_RefType_RefType_MIN = Instruction_RefType_CodeRef;
+const Instruction_RefType Instruction_RefType_RefType_MAX = Instruction_RefType_DataRef;
+const int Instruction_RefType_RefType_ARRAYSIZE = Instruction_RefType_RefType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* Instruction_RefType_descriptor();
+inline const ::std::string& Instruction_RefType_Name(Instruction_RefType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    Instruction_RefType_descriptor(), value);
+}
+inline bool Instruction_RefType_Parse(
+    const ::std::string& name, Instruction_RefType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<Instruction_RefType>(
+    Instruction_RefType_descriptor(), name, value);
+}
 enum ExternalFunction_CallingConvention {
   ExternalFunction_CallingConvention_CallerCleanup = 0,
   ExternalFunction_CallingConvention_CalleeCleanup = 1,
@@ -507,6 +528,30 @@ class Instruction : public ::google::protobuf::Message {
 
   // nested types ----------------------------------------------------
 
+  typedef Instruction_RefType RefType;
+  static const RefType CodeRef = Instruction_RefType_CodeRef;
+  static const RefType DataRef = Instruction_RefType_DataRef;
+  static inline bool RefType_IsValid(int value) {
+    return Instruction_RefType_IsValid(value);
+  }
+  static const RefType RefType_MIN =
+    Instruction_RefType_RefType_MIN;
+  static const RefType RefType_MAX =
+    Instruction_RefType_RefType_MAX;
+  static const int RefType_ARRAYSIZE =
+    Instruction_RefType_RefType_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  RefType_descriptor() {
+    return Instruction_RefType_descriptor();
+  }
+  static inline const ::std::string& RefType_Name(RefType value) {
+    return Instruction_RefType_Name(value);
+  }
+  static inline bool RefType_Parse(const ::std::string& name,
+      RefType* value) {
+    return Instruction_RefType_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
   // required bytes inst_bytes = 1;
@@ -549,12 +594,47 @@ class Instruction : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 inst_len() const;
   inline void set_inst_len(::google::protobuf::int32 value);
 
-  // optional int64 data_offset = 6;
-  inline bool has_data_offset() const;
-  inline void clear_data_offset();
-  static const int kDataOffsetFieldNumber = 6;
-  inline ::google::protobuf::int64 data_offset() const;
-  inline void set_data_offset(::google::protobuf::int64 value);
+  // optional int64 imm_reference = 6;
+  inline bool has_imm_reference() const;
+  inline void clear_imm_reference();
+  static const int kImmReferenceFieldNumber = 6;
+  inline ::google::protobuf::int64 imm_reference() const;
+  inline void set_imm_reference(::google::protobuf::int64 value);
+
+  // optional int64 imm_reloc_offset = 15;
+  inline bool has_imm_reloc_offset() const;
+  inline void clear_imm_reloc_offset();
+  static const int kImmRelocOffsetFieldNumber = 15;
+  inline ::google::protobuf::int64 imm_reloc_offset() const;
+  inline void set_imm_reloc_offset(::google::protobuf::int64 value);
+
+  // optional .Instruction.RefType imm_ref_type = 16;
+  inline bool has_imm_ref_type() const;
+  inline void clear_imm_ref_type();
+  static const int kImmRefTypeFieldNumber = 16;
+  inline ::Instruction_RefType imm_ref_type() const;
+  inline void set_imm_ref_type(::Instruction_RefType value);
+
+  // optional int64 mem_reference = 8;
+  inline bool has_mem_reference() const;
+  inline void clear_mem_reference();
+  static const int kMemReferenceFieldNumber = 8;
+  inline ::google::protobuf::int64 mem_reference() const;
+  inline void set_mem_reference(::google::protobuf::int64 value);
+
+  // optional int64 mem_reloc_offset = 9;
+  inline bool has_mem_reloc_offset() const;
+  inline void clear_mem_reloc_offset();
+  static const int kMemRelocOffsetFieldNumber = 9;
+  inline ::google::protobuf::int64 mem_reloc_offset() const;
+  inline void set_mem_reloc_offset(::google::protobuf::int64 value);
+
+  // optional .Instruction.RefType mem_ref_type = 18;
+  inline bool has_mem_ref_type() const;
+  inline void clear_mem_ref_type();
+  static const int kMemRefTypeFieldNumber = 18;
+  inline ::Instruction_RefType mem_ref_type() const;
+  inline void set_mem_ref_type(::Instruction_RefType value);
 
   // optional string ext_call_name = 7;
   inline bool has_ext_call_name() const;
@@ -567,20 +647,6 @@ class Instruction : public ::google::protobuf::Message {
   inline ::std::string* mutable_ext_call_name();
   inline ::std::string* release_ext_call_name();
   inline void set_allocated_ext_call_name(::std::string* ext_call_name);
-
-  // optional int64 call_target = 8;
-  inline bool has_call_target() const;
-  inline void clear_call_target();
-  static const int kCallTargetFieldNumber = 8;
-  inline ::google::protobuf::int64 call_target() const;
-  inline void set_call_target(::google::protobuf::int64 value);
-
-  // optional int32 reloc_offset = 9;
-  inline bool has_reloc_offset() const;
-  inline void clear_reloc_offset();
-  static const int kRelocOffsetFieldNumber = 9;
-  inline ::google::protobuf::int32 reloc_offset() const;
-  inline void set_reloc_offset(::google::protobuf::int32 value);
 
   // optional .JumpTbl jump_table = 10;
   inline bool has_jump_table() const;
@@ -638,14 +704,20 @@ class Instruction : public ::google::protobuf::Message {
   inline void clear_has_false_target();
   inline void set_has_inst_len();
   inline void clear_has_inst_len();
-  inline void set_has_data_offset();
-  inline void clear_has_data_offset();
+  inline void set_has_imm_reference();
+  inline void clear_has_imm_reference();
+  inline void set_has_imm_reloc_offset();
+  inline void clear_has_imm_reloc_offset();
+  inline void set_has_imm_ref_type();
+  inline void clear_has_imm_ref_type();
+  inline void set_has_mem_reference();
+  inline void clear_has_mem_reference();
+  inline void set_has_mem_reloc_offset();
+  inline void clear_has_mem_reloc_offset();
+  inline void set_has_mem_ref_type();
+  inline void clear_has_mem_ref_type();
   inline void set_has_ext_call_name();
   inline void clear_has_ext_call_name();
-  inline void set_has_call_target();
-  inline void clear_has_call_target();
-  inline void set_has_reloc_offset();
-  inline void clear_has_reloc_offset();
   inline void set_has_jump_table();
   inline void clear_has_jump_table();
   inline void set_has_jump_index_table();
@@ -663,19 +735,22 @@ class Instruction : public ::google::protobuf::Message {
   ::google::protobuf::int64 inst_addr_;
   ::google::protobuf::int64 true_target_;
   ::google::protobuf::int64 false_target_;
-  ::google::protobuf::int64 data_offset_;
-  ::std::string* ext_call_name_;
+  ::google::protobuf::int64 imm_reference_;
   ::google::protobuf::int32 inst_len_;
-  ::google::protobuf::int32 reloc_offset_;
-  ::google::protobuf::int64 call_target_;
+  int imm_ref_type_;
+  ::google::protobuf::int64 imm_reloc_offset_;
+  ::google::protobuf::int64 mem_reference_;
+  ::google::protobuf::int64 mem_reloc_offset_;
+  ::std::string* ext_call_name_;
   ::JumpTbl* jump_table_;
+  int mem_ref_type_;
+  ::google::protobuf::int32 system_call_number_;
   ::JumpIndexTbl* jump_index_table_;
   ::std::string* ext_data_name_;
-  ::google::protobuf::int32 system_call_number_;
   bool local_noreturn_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(14 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(17 + 31) / 32];
 
   friend void  protobuf_AddDesc_CFG_2eproto();
   friend void protobuf_AssignDesc_CFG_2eproto();
@@ -794,6 +869,225 @@ class Block : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
+class Variable : public ::google::protobuf::Message {
+ public:
+  Variable();
+  virtual ~Variable();
+
+  Variable(const Variable& from);
+
+  inline Variable& operator=(const Variable& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Variable& default_instance();
+
+  void Swap(Variable* other);
+
+  // implements Message ----------------------------------------------
+
+  Variable* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Variable& from);
+  void MergeFrom(const Variable& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required string name = 1;
+  inline bool has_name() const;
+  inline void clear_name();
+  static const int kNameFieldNumber = 1;
+  inline const ::std::string& name() const;
+  inline void set_name(const ::std::string& value);
+  inline void set_name(const char* value);
+  inline void set_name(const char* value, size_t size);
+  inline ::std::string* mutable_name();
+  inline ::std::string* release_name();
+  inline void set_allocated_name(::std::string* name);
+
+  // required int64 size = 2;
+  inline bool has_size() const;
+  inline void clear_size();
+  static const int kSizeFieldNumber = 2;
+  inline ::google::protobuf::int64 size() const;
+  inline void set_size(::google::protobuf::int64 value);
+
+  // required string ida_type = 3;
+  inline bool has_ida_type() const;
+  inline void clear_ida_type();
+  static const int kIdaTypeFieldNumber = 3;
+  inline const ::std::string& ida_type() const;
+  inline void set_ida_type(const ::std::string& value);
+  inline void set_ida_type(const char* value);
+  inline void set_ida_type(const char* value, size_t size);
+  inline ::std::string* mutable_ida_type();
+  inline ::std::string* release_ida_type();
+  inline void set_allocated_ida_type(::std::string* ida_type);
+
+  // repeated .Instruction inst_refs = 5;
+  inline int inst_refs_size() const;
+  inline void clear_inst_refs();
+  static const int kInstRefsFieldNumber = 5;
+  inline const ::Instruction& inst_refs(int index) const;
+  inline ::Instruction* mutable_inst_refs(int index);
+  inline ::Instruction* add_inst_refs();
+  inline const ::google::protobuf::RepeatedPtrField< ::Instruction >&
+      inst_refs() const;
+  inline ::google::protobuf::RepeatedPtrField< ::Instruction >*
+      mutable_inst_refs();
+
+  // @@protoc_insertion_point(class_scope:Variable)
+ private:
+  inline void set_has_name();
+  inline void clear_has_name();
+  inline void set_has_size();
+  inline void clear_has_size();
+  inline void set_has_ida_type();
+  inline void clear_has_ida_type();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::std::string* name_;
+  ::google::protobuf::int64 size_;
+  ::std::string* ida_type_;
+  ::google::protobuf::RepeatedPtrField< ::Instruction > inst_refs_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+
+  friend void  protobuf_AddDesc_CFG_2eproto();
+  friend void protobuf_AssignDesc_CFG_2eproto();
+  friend void protobuf_ShutdownFile_CFG_2eproto();
+
+  void InitAsDefaultInstance();
+  static Variable* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class StackVar : public ::google::protobuf::Message {
+ public:
+  StackVar();
+  virtual ~StackVar();
+
+  StackVar(const StackVar& from);
+
+  inline StackVar& operator=(const StackVar& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const StackVar& default_instance();
+
+  void Swap(StackVar* other);
+
+  // implements Message ----------------------------------------------
+
+  StackVar* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const StackVar& from);
+  void MergeFrom(const StackVar& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required .Variable var = 1;
+  inline bool has_var() const;
+  inline void clear_var();
+  static const int kVarFieldNumber = 1;
+  inline const ::Variable& var() const;
+  inline ::Variable* mutable_var();
+  inline ::Variable* release_var();
+  inline void set_allocated_var(::Variable* var);
+
+  // required int64 sp_offset = 2;
+  inline bool has_sp_offset() const;
+  inline void clear_sp_offset();
+  static const int kSpOffsetFieldNumber = 2;
+  inline ::google::protobuf::int64 sp_offset() const;
+  inline void set_sp_offset(::google::protobuf::int64 value);
+
+  // @@protoc_insertion_point(class_scope:StackVar)
+ private:
+  inline void set_has_var();
+  inline void clear_has_var();
+  inline void set_has_sp_offset();
+  inline void clear_has_sp_offset();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::Variable* var_;
+  ::google::protobuf::int64 sp_offset_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+
+  friend void  protobuf_AddDesc_CFG_2eproto();
+  friend void protobuf_AssignDesc_CFG_2eproto();
+  friend void protobuf_ShutdownFile_CFG_2eproto();
+
+  void InitAsDefaultInstance();
+  static StackVar* default_instance_;
+};
+// -------------------------------------------------------------------
+
 class Function : public ::google::protobuf::Message {
  public:
   Function();
@@ -867,6 +1161,18 @@ class Function : public ::google::protobuf::Message {
   inline ::google::protobuf::int64 entry_address() const;
   inline void set_entry_address(::google::protobuf::int64 value);
 
+  // repeated .StackVar stackvars = 3;
+  inline int stackvars_size() const;
+  inline void clear_stackvars();
+  static const int kStackvarsFieldNumber = 3;
+  inline const ::StackVar& stackvars(int index) const;
+  inline ::StackVar* mutable_stackvars(int index);
+  inline ::StackVar* add_stackvars();
+  inline const ::google::protobuf::RepeatedPtrField< ::StackVar >&
+      stackvars() const;
+  inline ::google::protobuf::RepeatedPtrField< ::StackVar >*
+      mutable_stackvars();
+
   // @@protoc_insertion_point(class_scope:Function)
  private:
   inline void set_has_entry_address();
@@ -876,9 +1182,10 @@ class Function : public ::google::protobuf::Message {
 
   ::google::protobuf::RepeatedPtrField< ::Block > blocks_;
   ::google::protobuf::int64 entry_address_;
+  ::google::protobuf::RepeatedPtrField< ::StackVar > stackvars_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
 
   friend void  protobuf_AddDesc_CFG_2eproto();
   friend void protobuf_AssignDesc_CFG_2eproto();
@@ -3746,37 +4053,149 @@ inline void Instruction::set_inst_len(::google::protobuf::int32 value) {
   inst_len_ = value;
 }
 
-// optional int64 data_offset = 6;
-inline bool Instruction::has_data_offset() const {
+// optional int64 imm_reference = 6;
+inline bool Instruction::has_imm_reference() const {
   return (_has_bits_[0] & 0x00000020u) != 0;
 }
-inline void Instruction::set_has_data_offset() {
+inline void Instruction::set_has_imm_reference() {
   _has_bits_[0] |= 0x00000020u;
 }
-inline void Instruction::clear_has_data_offset() {
+inline void Instruction::clear_has_imm_reference() {
   _has_bits_[0] &= ~0x00000020u;
 }
-inline void Instruction::clear_data_offset() {
-  data_offset_ = GOOGLE_LONGLONG(0);
-  clear_has_data_offset();
+inline void Instruction::clear_imm_reference() {
+  imm_reference_ = GOOGLE_LONGLONG(0);
+  clear_has_imm_reference();
 }
-inline ::google::protobuf::int64 Instruction::data_offset() const {
-  return data_offset_;
+inline ::google::protobuf::int64 Instruction::imm_reference() const {
+  return imm_reference_;
 }
-inline void Instruction::set_data_offset(::google::protobuf::int64 value) {
-  set_has_data_offset();
-  data_offset_ = value;
+inline void Instruction::set_imm_reference(::google::protobuf::int64 value) {
+  set_has_imm_reference();
+  imm_reference_ = value;
+}
+
+// optional int64 imm_reloc_offset = 15;
+inline bool Instruction::has_imm_reloc_offset() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void Instruction::set_has_imm_reloc_offset() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void Instruction::clear_has_imm_reloc_offset() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void Instruction::clear_imm_reloc_offset() {
+  imm_reloc_offset_ = GOOGLE_LONGLONG(0);
+  clear_has_imm_reloc_offset();
+}
+inline ::google::protobuf::int64 Instruction::imm_reloc_offset() const {
+  return imm_reloc_offset_;
+}
+inline void Instruction::set_imm_reloc_offset(::google::protobuf::int64 value) {
+  set_has_imm_reloc_offset();
+  imm_reloc_offset_ = value;
+}
+
+// optional .Instruction.RefType imm_ref_type = 16;
+inline bool Instruction::has_imm_ref_type() const {
+  return (_has_bits_[0] & 0x00000080u) != 0;
+}
+inline void Instruction::set_has_imm_ref_type() {
+  _has_bits_[0] |= 0x00000080u;
+}
+inline void Instruction::clear_has_imm_ref_type() {
+  _has_bits_[0] &= ~0x00000080u;
+}
+inline void Instruction::clear_imm_ref_type() {
+  imm_ref_type_ = 0;
+  clear_has_imm_ref_type();
+}
+inline ::Instruction_RefType Instruction::imm_ref_type() const {
+  return static_cast< ::Instruction_RefType >(imm_ref_type_);
+}
+inline void Instruction::set_imm_ref_type(::Instruction_RefType value) {
+  assert(::Instruction_RefType_IsValid(value));
+  set_has_imm_ref_type();
+  imm_ref_type_ = value;
+}
+
+// optional int64 mem_reference = 8;
+inline bool Instruction::has_mem_reference() const {
+  return (_has_bits_[0] & 0x00000100u) != 0;
+}
+inline void Instruction::set_has_mem_reference() {
+  _has_bits_[0] |= 0x00000100u;
+}
+inline void Instruction::clear_has_mem_reference() {
+  _has_bits_[0] &= ~0x00000100u;
+}
+inline void Instruction::clear_mem_reference() {
+  mem_reference_ = GOOGLE_LONGLONG(0);
+  clear_has_mem_reference();
+}
+inline ::google::protobuf::int64 Instruction::mem_reference() const {
+  return mem_reference_;
+}
+inline void Instruction::set_mem_reference(::google::protobuf::int64 value) {
+  set_has_mem_reference();
+  mem_reference_ = value;
+}
+
+// optional int64 mem_reloc_offset = 9;
+inline bool Instruction::has_mem_reloc_offset() const {
+  return (_has_bits_[0] & 0x00000200u) != 0;
+}
+inline void Instruction::set_has_mem_reloc_offset() {
+  _has_bits_[0] |= 0x00000200u;
+}
+inline void Instruction::clear_has_mem_reloc_offset() {
+  _has_bits_[0] &= ~0x00000200u;
+}
+inline void Instruction::clear_mem_reloc_offset() {
+  mem_reloc_offset_ = GOOGLE_LONGLONG(0);
+  clear_has_mem_reloc_offset();
+}
+inline ::google::protobuf::int64 Instruction::mem_reloc_offset() const {
+  return mem_reloc_offset_;
+}
+inline void Instruction::set_mem_reloc_offset(::google::protobuf::int64 value) {
+  set_has_mem_reloc_offset();
+  mem_reloc_offset_ = value;
+}
+
+// optional .Instruction.RefType mem_ref_type = 18;
+inline bool Instruction::has_mem_ref_type() const {
+  return (_has_bits_[0] & 0x00000400u) != 0;
+}
+inline void Instruction::set_has_mem_ref_type() {
+  _has_bits_[0] |= 0x00000400u;
+}
+inline void Instruction::clear_has_mem_ref_type() {
+  _has_bits_[0] &= ~0x00000400u;
+}
+inline void Instruction::clear_mem_ref_type() {
+  mem_ref_type_ = 0;
+  clear_has_mem_ref_type();
+}
+inline ::Instruction_RefType Instruction::mem_ref_type() const {
+  return static_cast< ::Instruction_RefType >(mem_ref_type_);
+}
+inline void Instruction::set_mem_ref_type(::Instruction_RefType value) {
+  assert(::Instruction_RefType_IsValid(value));
+  set_has_mem_ref_type();
+  mem_ref_type_ = value;
 }
 
 // optional string ext_call_name = 7;
 inline bool Instruction::has_ext_call_name() const {
-  return (_has_bits_[0] & 0x00000040u) != 0;
+  return (_has_bits_[0] & 0x00000800u) != 0;
 }
 inline void Instruction::set_has_ext_call_name() {
-  _has_bits_[0] |= 0x00000040u;
+  _has_bits_[0] |= 0x00000800u;
 }
 inline void Instruction::clear_has_ext_call_name() {
-  _has_bits_[0] &= ~0x00000040u;
+  _has_bits_[0] &= ~0x00000800u;
 }
 inline void Instruction::clear_ext_call_name() {
   if (ext_call_name_ != &::google::protobuf::internal::kEmptyString) {
@@ -3838,59 +4257,15 @@ inline void Instruction::set_allocated_ext_call_name(::std::string* ext_call_nam
   }
 }
 
-// optional int64 call_target = 8;
-inline bool Instruction::has_call_target() const {
-  return (_has_bits_[0] & 0x00000080u) != 0;
-}
-inline void Instruction::set_has_call_target() {
-  _has_bits_[0] |= 0x00000080u;
-}
-inline void Instruction::clear_has_call_target() {
-  _has_bits_[0] &= ~0x00000080u;
-}
-inline void Instruction::clear_call_target() {
-  call_target_ = GOOGLE_LONGLONG(0);
-  clear_has_call_target();
-}
-inline ::google::protobuf::int64 Instruction::call_target() const {
-  return call_target_;
-}
-inline void Instruction::set_call_target(::google::protobuf::int64 value) {
-  set_has_call_target();
-  call_target_ = value;
-}
-
-// optional int32 reloc_offset = 9;
-inline bool Instruction::has_reloc_offset() const {
-  return (_has_bits_[0] & 0x00000100u) != 0;
-}
-inline void Instruction::set_has_reloc_offset() {
-  _has_bits_[0] |= 0x00000100u;
-}
-inline void Instruction::clear_has_reloc_offset() {
-  _has_bits_[0] &= ~0x00000100u;
-}
-inline void Instruction::clear_reloc_offset() {
-  reloc_offset_ = 0;
-  clear_has_reloc_offset();
-}
-inline ::google::protobuf::int32 Instruction::reloc_offset() const {
-  return reloc_offset_;
-}
-inline void Instruction::set_reloc_offset(::google::protobuf::int32 value) {
-  set_has_reloc_offset();
-  reloc_offset_ = value;
-}
-
 // optional .JumpTbl jump_table = 10;
 inline bool Instruction::has_jump_table() const {
-  return (_has_bits_[0] & 0x00000200u) != 0;
+  return (_has_bits_[0] & 0x00001000u) != 0;
 }
 inline void Instruction::set_has_jump_table() {
-  _has_bits_[0] |= 0x00000200u;
+  _has_bits_[0] |= 0x00001000u;
 }
 inline void Instruction::clear_has_jump_table() {
-  _has_bits_[0] &= ~0x00000200u;
+  _has_bits_[0] &= ~0x00001000u;
 }
 inline void Instruction::clear_jump_table() {
   if (jump_table_ != NULL) jump_table_->::JumpTbl::Clear();
@@ -3922,13 +4297,13 @@ inline void Instruction::set_allocated_jump_table(::JumpTbl* jump_table) {
 
 // optional .JumpIndexTbl jump_index_table = 11;
 inline bool Instruction::has_jump_index_table() const {
-  return (_has_bits_[0] & 0x00000400u) != 0;
+  return (_has_bits_[0] & 0x00002000u) != 0;
 }
 inline void Instruction::set_has_jump_index_table() {
-  _has_bits_[0] |= 0x00000400u;
+  _has_bits_[0] |= 0x00002000u;
 }
 inline void Instruction::clear_has_jump_index_table() {
-  _has_bits_[0] &= ~0x00000400u;
+  _has_bits_[0] &= ~0x00002000u;
 }
 inline void Instruction::clear_jump_index_table() {
   if (jump_index_table_ != NULL) jump_index_table_->::JumpIndexTbl::Clear();
@@ -3960,13 +4335,13 @@ inline void Instruction::set_allocated_jump_index_table(::JumpIndexTbl* jump_ind
 
 // optional string ext_data_name = 12;
 inline bool Instruction::has_ext_data_name() const {
-  return (_has_bits_[0] & 0x00000800u) != 0;
+  return (_has_bits_[0] & 0x00004000u) != 0;
 }
 inline void Instruction::set_has_ext_data_name() {
-  _has_bits_[0] |= 0x00000800u;
+  _has_bits_[0] |= 0x00004000u;
 }
 inline void Instruction::clear_has_ext_data_name() {
-  _has_bits_[0] &= ~0x00000800u;
+  _has_bits_[0] &= ~0x00004000u;
 }
 inline void Instruction::clear_ext_data_name() {
   if (ext_data_name_ != &::google::protobuf::internal::kEmptyString) {
@@ -4030,13 +4405,13 @@ inline void Instruction::set_allocated_ext_data_name(::std::string* ext_data_nam
 
 // optional int32 system_call_number = 13;
 inline bool Instruction::has_system_call_number() const {
-  return (_has_bits_[0] & 0x00001000u) != 0;
+  return (_has_bits_[0] & 0x00008000u) != 0;
 }
 inline void Instruction::set_has_system_call_number() {
-  _has_bits_[0] |= 0x00001000u;
+  _has_bits_[0] |= 0x00008000u;
 }
 inline void Instruction::clear_has_system_call_number() {
-  _has_bits_[0] &= ~0x00001000u;
+  _has_bits_[0] &= ~0x00008000u;
 }
 inline void Instruction::clear_system_call_number() {
   system_call_number_ = 0;
@@ -4052,13 +4427,13 @@ inline void Instruction::set_system_call_number(::google::protobuf::int32 value)
 
 // optional bool local_noreturn = 14;
 inline bool Instruction::has_local_noreturn() const {
-  return (_has_bits_[0] & 0x00002000u) != 0;
+  return (_has_bits_[0] & 0x00010000u) != 0;
 }
 inline void Instruction::set_has_local_noreturn() {
-  _has_bits_[0] |= 0x00002000u;
+  _has_bits_[0] |= 0x00010000u;
 }
 inline void Instruction::clear_has_local_noreturn() {
-  _has_bits_[0] &= ~0x00002000u;
+  _has_bits_[0] &= ~0x00010000u;
 }
 inline void Instruction::clear_local_noreturn() {
   local_noreturn_ = false;
@@ -4150,6 +4525,261 @@ Block::mutable_block_follows() {
 
 // -------------------------------------------------------------------
 
+// Variable
+
+// required string name = 1;
+inline bool Variable::has_name() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void Variable::set_has_name() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void Variable::clear_has_name() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void Variable::clear_name() {
+  if (name_ != &::google::protobuf::internal::kEmptyString) {
+    name_->clear();
+  }
+  clear_has_name();
+}
+inline const ::std::string& Variable::name() const {
+  return *name_;
+}
+inline void Variable::set_name(const ::std::string& value) {
+  set_has_name();
+  if (name_ == &::google::protobuf::internal::kEmptyString) {
+    name_ = new ::std::string;
+  }
+  name_->assign(value);
+}
+inline void Variable::set_name(const char* value) {
+  set_has_name();
+  if (name_ == &::google::protobuf::internal::kEmptyString) {
+    name_ = new ::std::string;
+  }
+  name_->assign(value);
+}
+inline void Variable::set_name(const char* value, size_t size) {
+  set_has_name();
+  if (name_ == &::google::protobuf::internal::kEmptyString) {
+    name_ = new ::std::string;
+  }
+  name_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Variable::mutable_name() {
+  set_has_name();
+  if (name_ == &::google::protobuf::internal::kEmptyString) {
+    name_ = new ::std::string;
+  }
+  return name_;
+}
+inline ::std::string* Variable::release_name() {
+  clear_has_name();
+  if (name_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = name_;
+    name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void Variable::set_allocated_name(::std::string* name) {
+  if (name_ != &::google::protobuf::internal::kEmptyString) {
+    delete name_;
+  }
+  if (name) {
+    set_has_name();
+    name_ = name;
+  } else {
+    clear_has_name();
+    name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
+// required int64 size = 2;
+inline bool Variable::has_size() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void Variable::set_has_size() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void Variable::clear_has_size() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void Variable::clear_size() {
+  size_ = GOOGLE_LONGLONG(0);
+  clear_has_size();
+}
+inline ::google::protobuf::int64 Variable::size() const {
+  return size_;
+}
+inline void Variable::set_size(::google::protobuf::int64 value) {
+  set_has_size();
+  size_ = value;
+}
+
+// required string ida_type = 3;
+inline bool Variable::has_ida_type() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void Variable::set_has_ida_type() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void Variable::clear_has_ida_type() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void Variable::clear_ida_type() {
+  if (ida_type_ != &::google::protobuf::internal::kEmptyString) {
+    ida_type_->clear();
+  }
+  clear_has_ida_type();
+}
+inline const ::std::string& Variable::ida_type() const {
+  return *ida_type_;
+}
+inline void Variable::set_ida_type(const ::std::string& value) {
+  set_has_ida_type();
+  if (ida_type_ == &::google::protobuf::internal::kEmptyString) {
+    ida_type_ = new ::std::string;
+  }
+  ida_type_->assign(value);
+}
+inline void Variable::set_ida_type(const char* value) {
+  set_has_ida_type();
+  if (ida_type_ == &::google::protobuf::internal::kEmptyString) {
+    ida_type_ = new ::std::string;
+  }
+  ida_type_->assign(value);
+}
+inline void Variable::set_ida_type(const char* value, size_t size) {
+  set_has_ida_type();
+  if (ida_type_ == &::google::protobuf::internal::kEmptyString) {
+    ida_type_ = new ::std::string;
+  }
+  ida_type_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Variable::mutable_ida_type() {
+  set_has_ida_type();
+  if (ida_type_ == &::google::protobuf::internal::kEmptyString) {
+    ida_type_ = new ::std::string;
+  }
+  return ida_type_;
+}
+inline ::std::string* Variable::release_ida_type() {
+  clear_has_ida_type();
+  if (ida_type_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = ida_type_;
+    ida_type_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void Variable::set_allocated_ida_type(::std::string* ida_type) {
+  if (ida_type_ != &::google::protobuf::internal::kEmptyString) {
+    delete ida_type_;
+  }
+  if (ida_type) {
+    set_has_ida_type();
+    ida_type_ = ida_type;
+  } else {
+    clear_has_ida_type();
+    ida_type_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
+}
+
+// repeated .Instruction inst_refs = 5;
+inline int Variable::inst_refs_size() const {
+  return inst_refs_.size();
+}
+inline void Variable::clear_inst_refs() {
+  inst_refs_.Clear();
+}
+inline const ::Instruction& Variable::inst_refs(int index) const {
+  return inst_refs_.Get(index);
+}
+inline ::Instruction* Variable::mutable_inst_refs(int index) {
+  return inst_refs_.Mutable(index);
+}
+inline ::Instruction* Variable::add_inst_refs() {
+  return inst_refs_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::Instruction >&
+Variable::inst_refs() const {
+  return inst_refs_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::Instruction >*
+Variable::mutable_inst_refs() {
+  return &inst_refs_;
+}
+
+// -------------------------------------------------------------------
+
+// StackVar
+
+// required .Variable var = 1;
+inline bool StackVar::has_var() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void StackVar::set_has_var() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void StackVar::clear_has_var() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void StackVar::clear_var() {
+  if (var_ != NULL) var_->::Variable::Clear();
+  clear_has_var();
+}
+inline const ::Variable& StackVar::var() const {
+  return var_ != NULL ? *var_ : *default_instance_->var_;
+}
+inline ::Variable* StackVar::mutable_var() {
+  set_has_var();
+  if (var_ == NULL) var_ = new ::Variable;
+  return var_;
+}
+inline ::Variable* StackVar::release_var() {
+  clear_has_var();
+  ::Variable* temp = var_;
+  var_ = NULL;
+  return temp;
+}
+inline void StackVar::set_allocated_var(::Variable* var) {
+  delete var_;
+  var_ = var;
+  if (var) {
+    set_has_var();
+  } else {
+    clear_has_var();
+  }
+}
+
+// required int64 sp_offset = 2;
+inline bool StackVar::has_sp_offset() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void StackVar::set_has_sp_offset() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void StackVar::clear_has_sp_offset() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void StackVar::clear_sp_offset() {
+  sp_offset_ = GOOGLE_LONGLONG(0);
+  clear_has_sp_offset();
+}
+inline ::google::protobuf::int64 StackVar::sp_offset() const {
+  return sp_offset_;
+}
+inline void StackVar::set_sp_offset(::google::protobuf::int64 value) {
+  set_has_sp_offset();
+  sp_offset_ = value;
+}
+
+// -------------------------------------------------------------------
+
 // Function
 
 // repeated .Block blocks = 1;
@@ -4197,6 +4827,31 @@ inline ::google::protobuf::int64 Function::entry_address() const {
 inline void Function::set_entry_address(::google::protobuf::int64 value) {
   set_has_entry_address();
   entry_address_ = value;
+}
+
+// repeated .StackVar stackvars = 3;
+inline int Function::stackvars_size() const {
+  return stackvars_.size();
+}
+inline void Function::clear_stackvars() {
+  stackvars_.Clear();
+}
+inline const ::StackVar& Function::stackvars(int index) const {
+  return stackvars_.Get(index);
+}
+inline ::StackVar* Function::mutable_stackvars(int index) {
+  return stackvars_.Mutable(index);
+}
+inline ::StackVar* Function::add_stackvars() {
+  return stackvars_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::StackVar >&
+Function::stackvars() const {
+  return stackvars_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::StackVar >*
+Function::mutable_stackvars() {
+  return &stackvars_;
 }
 
 // -------------------------------------------------------------------
@@ -7148,6 +7803,10 @@ Disassembly::mutable_func() {
 namespace google {
 namespace protobuf {
 
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Instruction_RefType>() {
+  return ::Instruction_RefType_descriptor();
+}
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::ExternalFunction_CallingConvention>() {
   return ::ExternalFunction_CallingConvention_descriptor();
