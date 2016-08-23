@@ -1619,8 +1619,10 @@ def recoverStackVars(M, F):
     from var_recovery import parse_ida_types
 
     # pull info from IDA
-    stack_locals = collect_ida.collect_func_vars(F)
-    
+    (stack_locals, ref) = collect_ida.collect_func_vars(F)
+    print "ref:"
+    print ref
+
     # TODO: parse/recover type info
     stack_locals_typed = map(parse_ida_types.parse_type, stack_locals)
 
