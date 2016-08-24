@@ -575,7 +575,7 @@ void allocateStackLocals(Function *F, NativeFunctionPtr func) {
   for(std::list<NativeStackVarPtr>::iterator sv = stackvars.begin(); sv != stackvars.end(); ++sv)
   {
     // form type
-    // TODO just ints for now...
+    // TODO just ints for now; take into account type 
     switch((*sv)->get_size())
     {
       t = NULL; // debugging; probably should choose a better failure value
@@ -593,9 +593,12 @@ void allocateStackLocals(Function *F, NativeFunctionPtr func) {
         continue;
     }
     // alloca
-    cout << "Inserting var " << (*sv)->get_name() << ", size " << (*sv)->get_size() << std::endl;
-    Instruction *v = new AllocaInst(t, (*sv)->get_name(), cur);
-    cur = v;
+    if(t != NULL)
+    {
+      cout << "Inserting var " << (*sv)->get_name() << ", size " << (*sv)->get_size() << " (ida_type " << (*sv)->get_type() <<")" << std::endl;
+      Instruction *v = new AllocaInst(t, (*sv)->get_name(), cur);
+      cur = v;
+    }
   }
   return;
 }

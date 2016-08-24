@@ -627,8 +627,8 @@ def instructionHandler(M, B, inst, new_eas):
         if selfCallEA not in RECOVERED_EAS:
             DEBUG("Adding new EA: {0:x}\n".format(selfCallEA))
             new_eas.add(selfCallEA)
-            I.imm_reference = selfCallEA
-            I.imm_ref_type = CFG_pb2.Instruction.CodeRef
+            I.mem_reference = selfCallEA
+            I.mem_ref_type = CFG_pb2.Instruction.CodeRef
 
             return I, True
     
@@ -1304,12 +1304,16 @@ def getInstructionSize(ea):
 
 def recoverStackVars(M, F):
     from var_recovery import collect_ida
+    from var_recovery import parse_ida_types
 
     # pull info from IDA
-    stack_locals = collect_ida.collect_func_vars(F) 
-    # jam into M
+    (stack_locals, ref) = collect_ida.collect_func_vars(F)
+
+    # TODO: parse/recover type info
+    stack_locals_typed = map(parse_ida_types.parse_type, stack_locals)
+
+    # add to M
     for (var_offset, var_name, var_size, var_flags) in stack_locals:
-        # mash
         var = F.stackvars.add() 
         var.sp_offset = var_offset
         var.var.name = var_name
@@ -1342,7 +1346,8 @@ def recoverFunctionFromSet(M, F, blockset, new_eas):
             I, endBlock = instructionHandler(M, B, head, new_eas)
             # sometimes there is junk after a terminator due to off-by-ones in
             # IDAPython. Ignore them.
-            if endBlock or isRet(head) or isUnconditionalJump(head) or isTrap(head):
+            #if endBlock or isRet(head) or isUnconditionalJump(head) or isTrap(head):
+            if endBlock or isRet(head) or isTrap(head):
                 break
             prevHead = head
 
@@ -1392,7 +1397,8 @@ def recoverBlock(startEA):
                         b.succs.append(f)
                 return b
 
-            # if its not JMP 0, add next instruction to current block
+            # if its not JMP 0 or call 0, 
+            # add next instruction to current block
             curEA = nextEA
         # check if we need to make a new block
         elif len(follows) == 0:

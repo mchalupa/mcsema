@@ -1,9 +1,29 @@
+import idaapi
 import idautils
 import idc
 
 def DEBUG(s):
     #syslog.syslog(str(s))
     sys.stdout.write(str(s))
+
+def _signed_from_unsigned64(val):
+    if val & 0x8000000000000000:
+        return -0x10000000000000000 + val
+    return val
+
+def _signed_from_unsigned32(val):
+    if val & 0x80000000:
+        return -0x100000000 + val
+    return val
+
+if idaapi.get_inf_structure().is_64bit():
+    _signed_from_unsigned = _signed_from_unsigned64
+    _base_ptr = "rbp"
+    _stack_ptr = "rsp"
+elif idaapi.get_inf_structure().is_32bit():
+    _signed_from_unsigned = _signed_from_unsigned32
+    _base_ptr = "ebp"
+    _stack_ptr = "esp"
 
 def _get_flags_from_bits(flag):
     '''
@@ -97,19 +117,33 @@ def collect_func_vars(F):
     Skips stack arguments without names, as well as the special arguments with names " s" and " r".
     variable_flags is a string with flag names.
     '''
+    stackArgs = list()
+    stackArgs_ref = dict()
+    
     f = F.entry_address
+    name = idc.Name(f)
     end = idc.GetFunctionAttr(f, idc.FUNCATTR_END)
     _locals = idc.GetFunctionAttr(f, idc.FUNCATTR_FRSIZE)
     frame = idc.GetFrame(f)
     if frame is None:
-        return []
-    stackArgs = list()
+        return (stackArgs, stackArgs_ref)
+    
+    #grab the offset of the stored frame pointer, so that
+    #we can correlate offsets correctly in referant code
+    # e.g., EBP+(-0x4) will match up to the -0x4 offset
+    delta = idc.GetMemberOffset(frame, " s")
+    if -1 == delta:
+        #indicates that it wasn't found. Unsure exactly what to do 
+        # in that case, punting for now
+        delta = 0
+    
     offset = idc.GetFirstMember(frame)
-    while offset != 0xffffffff and offset != 0xffffffffffffffff:
+    #TODO: the following line should check the binary's address size as appropriate
+    while -1 != _signed_from_unsigned(offset):
         memberName = idc.GetMemberName(frame, offset)
         if memberName is None: 
-            #gaps in stack usage are fine, but generate trash output
-            #gaps also could indicate a buffer that IDA doesn't recognize
+            # gaps in stack usage are fine, but generate trash output
+            # gaps also could indicate a buffer that IDA doesn't recognize
             offset = idc.GetStrucNextOff(frame, offset)
             continue
         if (memberName == " r" or memberName == " s"):
@@ -120,10 +154,16 @@ def collect_func_vars(F):
         memberFlag = idc.GetMemberFlag(frame, offset)
         #TODO: handle the case where a struct is encountered (FF_STRU flag)
         flag_str = _get_flags_from_bits(memberFlag)
-        stackArgs.append((offset, memberName, memberSize, flag_str))
+        stackArgs.append((offset-delta, memberName, memberSize, flag_str))
+        stackArgs_ref[offset-delta] = [memberName, memberSize, flag_str]
         offset = idc.GetStrucNextOff(frame, offset)
     #functions.append({"name":name, "stackArgs":stackArgs})
-    return stackArgs 
+    if stackArgs is not None:
+      _find_local_references(f, {"name":name, "stackArgs":stackArgs_ref})
+    
+    # TODO combine infos
+
+    return (stackArgs, stackArgs_ref)
 
 def collect_func_vars_all():
     '''
@@ -142,6 +182,51 @@ def collect_func_vars_all():
         f_vars = collect_func_vars(f)
         functions.append({"ea":f_ea, "stackArgs":f_vars})
     return functions
+
+def _find_local_references(func, func_var_data):
+    # naive approach at first
+    base_ptr_format = "[{}+".format(_base_ptr)
+    stack_ptr_format = "[{}+".format(_stack_ptr)
+    frame = idc.GetFrame(func)
+    if frame is None:
+        return
+    regs = dict()
+    referers = set() # members of this set contain the address of an element on the stack
+    dereferences = dict() # members of this collection contain the data of an element on the stack
+    for addr in idautils.FuncItems(func):
+        if "lea" == idc.GetMnem(addr):
+            if base_ptr_format in idc.GetOpnd(addr, 1) or stack_ptr_format in idc.GetOpnd(addr, 1):
+                # right now just capture that it's a local reference, not its referant
+                referers.add(idc.GetOpnd(addr, 0))
+        if "mov" == idc.GetMnem(addr):
+            referers.discard(idc.GetOpnd(addr, 0))
+            dereferences.pop(idc.GetOpnd(addr, 0), None)
+            if idc.GetOpnd(addr, 1) in referers:
+                target_op = idc.GetOpnd(addr, 0)
+                if base_ptr_format in target_op:
+                    target_offset = target_op[len(base_ptr_format):target_op.index(']')]
+                    offset = _signed_from_unsigned(idc.GetOperandValue(addr, 0))
+                    if offset in func_var_data["stackArgs"].keys():
+                        func_var_data["stackArgs"][offset][2] += " | LOCAL_REFERER"
+                else:
+                    # lea eax, [ebp-8]
+                    # mov ebx, eax
+                    # mov [ebp-4], ebx
+                    referers.add(target_op)
+            elif base_ptr_format in idc.GetOpnd(addr, 1) or stack_ptr_format in idc.GetOpnd(addr, 1):
+                offset = _signed_from_unsigned(idc.GetOperandValue(addr, 1))
+                if offset in func_var_data["stackArgs"].keys():
+                    dereferences[idc.GetOpnd(addr, 0)] = offset
+        if "call" == idc.GetMnem(addr):
+            target_op = idc.GetOpnd(addr, 0)
+            if target_op in referers:
+                pass
+            if target_op in dereferences:
+                # mov eax, [ebp+4]
+                # call eax
+                func_var_data["stackArgs"][dereferences[target_op]][2] += " | CODE_PTR"
+            # clear the referers and dereferences?
+
 
 if __name__ == "__main__":
     print_func_vars()
