@@ -57,6 +57,11 @@ message Block {
     repeated    int64       block_follows = 3;
 }
 
+message Reference {
+    required  int64 inst_addr = 1;
+    required  int32 opd_idx = 2;
+}
+
 message Variable {
 
     // not sure this is what we want here, just throwing it in for now
@@ -80,21 +85,14 @@ message Variable {
     //    Struc = 1;
     //}
 
-    required    string  name = 1;
-    required    int64   size = 2;
+    required    string    name = 1;
+    required    int64     size = 2;
     //required    Type    type = 3; // ???
-    required    string  ida_type = 3; // TODO make into better :P
+    required    string    ida_type = 3; // TODO make into better :P
     //optional    OtherType othertype = 4; // ???
-
-    // instructions referring to this variable
-    // have run into issues with protobuf format before trying to make this
-    // work, so it'll need some kind of data format massaging i think.
-    // we need some kind of correlation between list vars and the insns
-    // that reference them, but i was having trouble getting ahold of insn
-    // references at the protobuf level last time i tried this. i might
-    // have just started using the instruction addresses instead and
-    // assuming i'd match them up in the next phase. (inst_addr in Instruction)
-    repeated    Instruction inst_refs = 5;
+    
+    // instructions referring to this variable 
+    repeated    Reference ref_eas = 4;
 
     // we probably want some kind of 'address' information here? but i'm not
     // sure. we're only doing stack vars for now so it's not as important as

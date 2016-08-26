@@ -37,6 +37,7 @@ class JumpTbl;
 class JumpIndexTbl;
 class Instruction;
 class Block;
+class Reference;
 class Variable;
 class StackVar;
 class Function;
@@ -1028,6 +1029,98 @@ class Block : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
+class Reference : public ::google::protobuf::Message {
+ public:
+  Reference();
+  virtual ~Reference();
+
+  Reference(const Reference& from);
+
+  inline Reference& operator=(const Reference& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Reference& default_instance();
+
+  void Swap(Reference* other);
+
+  // implements Message ----------------------------------------------
+
+  Reference* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Reference& from);
+  void MergeFrom(const Reference& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required int64 inst_addr = 1;
+  inline bool has_inst_addr() const;
+  inline void clear_inst_addr();
+  static const int kInstAddrFieldNumber = 1;
+  inline ::google::protobuf::int64 inst_addr() const;
+  inline void set_inst_addr(::google::protobuf::int64 value);
+
+  // required int32 opd_idx = 2;
+  inline bool has_opd_idx() const;
+  inline void clear_opd_idx();
+  static const int kOpdIdxFieldNumber = 2;
+  inline ::google::protobuf::int32 opd_idx() const;
+  inline void set_opd_idx(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:Reference)
+ private:
+  inline void set_has_inst_addr();
+  inline void clear_has_inst_addr();
+  inline void set_has_opd_idx();
+  inline void clear_has_opd_idx();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::int64 inst_addr_;
+  ::google::protobuf::int32 opd_idx_;
+
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+
+  friend void  protobuf_AddDesc_CFG_2eproto();
+  friend void protobuf_AssignDesc_CFG_2eproto();
+  friend void protobuf_ShutdownFile_CFG_2eproto();
+
+  void InitAsDefaultInstance();
+  static Reference* default_instance_;
+};
+// -------------------------------------------------------------------
+
 class Variable : public ::google::protobuf::Message {
  public:
   Variable();
@@ -1162,17 +1255,17 @@ class Variable : public ::google::protobuf::Message {
   inline ::std::string* release_ida_type();
   inline void set_allocated_ida_type(::std::string* ida_type);
 
-  // repeated .Instruction inst_refs = 5;
-  inline int inst_refs_size() const;
-  inline void clear_inst_refs();
-  static const int kInstRefsFieldNumber = 5;
-  inline const ::Instruction& inst_refs(int index) const;
-  inline ::Instruction* mutable_inst_refs(int index);
-  inline ::Instruction* add_inst_refs();
-  inline const ::google::protobuf::RepeatedPtrField< ::Instruction >&
-      inst_refs() const;
-  inline ::google::protobuf::RepeatedPtrField< ::Instruction >*
-      mutable_inst_refs();
+  // repeated .Reference ref_eas = 4;
+  inline int ref_eas_size() const;
+  inline void clear_ref_eas();
+  static const int kRefEasFieldNumber = 4;
+  inline const ::Reference& ref_eas(int index) const;
+  inline ::Reference* mutable_ref_eas(int index);
+  inline ::Reference* add_ref_eas();
+  inline const ::google::protobuf::RepeatedPtrField< ::Reference >&
+      ref_eas() const;
+  inline ::google::protobuf::RepeatedPtrField< ::Reference >*
+      mutable_ref_eas();
 
   // @@protoc_insertion_point(class_scope:Variable)
  private:
@@ -1188,7 +1281,7 @@ class Variable : public ::google::protobuf::Message {
   ::std::string* name_;
   ::google::protobuf::int64 size_;
   ::std::string* ida_type_;
-  ::google::protobuf::RepeatedPtrField< ::Instruction > inst_refs_;
+  ::google::protobuf::RepeatedPtrField< ::Reference > ref_eas_;
 
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
@@ -4880,6 +4973,54 @@ Block::mutable_block_follows() {
 
 // -------------------------------------------------------------------
 
+// Reference
+
+// required int64 inst_addr = 1;
+inline bool Reference::has_inst_addr() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void Reference::set_has_inst_addr() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void Reference::clear_has_inst_addr() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void Reference::clear_inst_addr() {
+  inst_addr_ = GOOGLE_LONGLONG(0);
+  clear_has_inst_addr();
+}
+inline ::google::protobuf::int64 Reference::inst_addr() const {
+  return inst_addr_;
+}
+inline void Reference::set_inst_addr(::google::protobuf::int64 value) {
+  set_has_inst_addr();
+  inst_addr_ = value;
+}
+
+// required int32 opd_idx = 2;
+inline bool Reference::has_opd_idx() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void Reference::set_has_opd_idx() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void Reference::clear_has_opd_idx() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void Reference::clear_opd_idx() {
+  opd_idx_ = 0;
+  clear_has_opd_idx();
+}
+inline ::google::protobuf::int32 Reference::opd_idx() const {
+  return opd_idx_;
+}
+inline void Reference::set_opd_idx(::google::protobuf::int32 value) {
+  set_has_opd_idx();
+  opd_idx_ = value;
+}
+
+// -------------------------------------------------------------------
+
 // Variable
 
 // required string name = 1;
@@ -5044,29 +5185,29 @@ inline void Variable::set_allocated_ida_type(::std::string* ida_type) {
   }
 }
 
-// repeated .Instruction inst_refs = 5;
-inline int Variable::inst_refs_size() const {
-  return inst_refs_.size();
+// repeated .Reference ref_eas = 4;
+inline int Variable::ref_eas_size() const {
+  return ref_eas_.size();
 }
-inline void Variable::clear_inst_refs() {
-  inst_refs_.Clear();
+inline void Variable::clear_ref_eas() {
+  ref_eas_.Clear();
 }
-inline const ::Instruction& Variable::inst_refs(int index) const {
-  return inst_refs_.Get(index);
+inline const ::Reference& Variable::ref_eas(int index) const {
+  return ref_eas_.Get(index);
 }
-inline ::Instruction* Variable::mutable_inst_refs(int index) {
-  return inst_refs_.Mutable(index);
+inline ::Reference* Variable::mutable_ref_eas(int index) {
+  return ref_eas_.Mutable(index);
 }
-inline ::Instruction* Variable::add_inst_refs() {
-  return inst_refs_.Add();
+inline ::Reference* Variable::add_ref_eas() {
+  return ref_eas_.Add();
 }
-inline const ::google::protobuf::RepeatedPtrField< ::Instruction >&
-Variable::inst_refs() const {
-  return inst_refs_;
+inline const ::google::protobuf::RepeatedPtrField< ::Reference >&
+Variable::ref_eas() const {
+  return ref_eas_;
 }
-inline ::google::protobuf::RepeatedPtrField< ::Instruction >*
-Variable::mutable_inst_refs() {
-  return &inst_refs_;
+inline ::google::protobuf::RepeatedPtrField< ::Reference >*
+Variable::mutable_ref_eas() {
+  return &ref_eas_;
 }
 
 // -------------------------------------------------------------------
