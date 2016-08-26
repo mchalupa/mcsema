@@ -30,8 +30,8 @@ def xrange(begin, end=None, step=1):
     else:
         return iter(itertools.count().next, begin)
 
-_DEBUG = False
 _DEBUG_FILE = sys.stderr
+_DEBUG = True
 
 EXTERNALS = set()
 DATA_SEGMENTS = {}
@@ -1620,12 +1620,14 @@ def recoverStackVars(M, F):
 
     # pull info from IDA
     (stack_locals, ref) = collect_ida.collect_func_vars(F)
+    DEBUG("refs:")
+    DEBUG("{}".format(ref))
 
     # TODO: parse/recover type info
     stack_locals_typed = map(parse_ida_types.parse_type, stack_locals)
 
     # add to M
-    for (var_offset, var_name, var_size, var_flags) in stack_locals:
+    for (var_offset, var_name, var_size, var_flags, _) in stack_locals:
         var = F.stackvars.add() 
         var.sp_offset = var_offset
         var.var.name = var_name
