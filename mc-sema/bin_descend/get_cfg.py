@@ -1914,8 +1914,8 @@ if __name__ == "__main__":
 
         recoverCfg(eps, outf, args.exports_are_apis, args.stack_vars)
 
-        if args.stack_vars:
-            DEBUG("Attempting to recover stack variable information...")
+        #if args.stack_vars:
+        #    DEBUG("Attempting to recover stack variable information...")
 
     except:
         DEBUG(traceback.format_exc())

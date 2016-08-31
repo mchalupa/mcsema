@@ -76,6 +76,8 @@ typedef boost::adjacency_matrix<boost::directedS> CFG;
 typedef uint64_t FuncID;
 typedef uint64_t VA;
 
+class NativeVar;
+typedef boost::shared_ptr<NativeVar> NativeVarPtr;
 class Inst;
 typedef boost::shared_ptr<Inst> InstPtr;
 
@@ -185,6 +187,11 @@ private:
 public:
     bool            has_mem_reference;
 private:
+    NativeVarPtr    mem_var;
+public:
+    bool            has_mem_var;
+
+private:
 
     uint32_t        arch;
     //  if this instruction is a system call, its system call number
@@ -251,6 +258,12 @@ private:
         } else {
             // void
         }
+    }
+
+    void set_mem_var(NativeVarPtr v)
+    {
+        this->mem_var = v;
+        this->has_mem_var = true;
     }
 
     void set_ref_type(CFGOpType op, CFGRefType rt) {
@@ -451,6 +464,8 @@ private:
         mem_reference(0),
         mem_ref_type(CFGDataRef),
         has_mem_reference(false),
+        //mem_var(0),
+        //has_mem_var(false),
         len(l),
         jump_table(false),
         jump_index_table(false),
@@ -502,13 +517,13 @@ class NativeVar {
     int64_t             size;
     std::string         name;
     std::string         type; // TODO: something cleverer than string. for now it's just ida_type wholesale.
-    std::list<InstPtr>  refs;
+    std::list<uint64_t>  refs;
     llvm::MCInstPrinter *MyPrinter;
     public:
     NativeVar(uint64_t size, std::string name, std::string type, llvm::MCInstPrinter *printer) : size(size), name(name), type(type), MyPrinter(printer) {}
     uint64_t get_size(void) { return this->size; }
-    void add_ref(InstPtr f) { this->refs.push_back(f); }
-    std::list<InstPtr> &get_refs(void) { return this->refs; }
+    void add_ref(uint64_t ea) { this->refs.push_back(ea); }
+    std::list<uint64_t> &get_refs(void) { return this->refs; }
     std::string print_var(void);
     std::string get_name(void) { return this->name; }
     std::string get_type(void) { return this->type; }
@@ -516,7 +531,6 @@ class NativeVar {
 
 } ;
 
-typedef boost::shared_ptr<NativeVar> NativeVarPtr;
 
 class NativeStackVar : public NativeVar {
     private:

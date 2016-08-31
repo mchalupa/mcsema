@@ -293,7 +293,7 @@ Inst::CFGRefType deserRefType(::Instruction::RefType k)
   }
 }
 
-InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder)
+InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder, std::list<NativeStackVarPtr> stackvars)
 {
   VA                      addr = inst.inst_addr();
   boost::int64_t          tr_tgt = inst.true_target();
@@ -353,6 +353,25 @@ InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder)
           rt = deserRefType(inst.mem_ref_type());
       }
 
+      // check for recovered stack var
+      for(std::list<NativeStackVarPtr>::iterator i = stackvars.begin(),
+          ie = stackvars.end();
+          i != ie;
+          i++)
+      {
+        std::list<uint64_t> refs = (*i)->get_refs();
+        for(std::list<uint64_t>::iterator r = refs.begin(),
+            re = refs.end();
+            r != re;
+            r++)
+        {
+          if(*r == addr)
+          {
+            ip->set_mem_var(*i);
+          }
+        }
+      }
+
       ip->set_ref_reloc_type(Inst::MEMRef, ref, ro, rt);
   }
 
@@ -400,13 +419,14 @@ InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder)
 }
 
 NativeBlockPtr  deserializeBlock( const ::Block   &block,
-                                  LLVMByteDecoder &decoder)
+                                  LLVMByteDecoder &decoder,
+                                  std::list<NativeStackVarPtr> stackvars)
 {
   NativeBlockPtr  natB =
     NativeBlockPtr(new NativeBlock(block.base_address(), decoder.getPrinter()));
   /* read all the instructions in */
   for(int i = 0; i < block.insts_size(); i++)
-    natB->add_inst(deserializeInst(block.insts(i), decoder));
+    natB->add_inst(deserializeInst(block.insts(i), decoder, stackvars));
 
   /* add the follows */
   for(int i = 0; i < block.block_follows_size(); i++)
@@ -424,7 +444,10 @@ NativeStackVarPtr  deserializeStackVar( const ::StackVar &stackvar,
   NativeStackVarPtr natSV =
     NativeStackVarPtr(new NativeStackVar(var.size(), var.name(), var.ida_type(), decoder.getPrinter(), stackvar.sp_offset()));
 
-  // TODO add refs
+  for(int i = 0; i < var.ref_eas_size(); i++)
+  {
+    natSV->add_ref(var.ref_eas(i).inst_addr());
+  }
 
   return natSV;
 }
@@ -434,17 +457,17 @@ NativeFunctionPtr deserializeFunction(const ::Function  &func,
 {
   NativeFunctionPtr natF =
     NativeFunctionPtr(new NativeFunction(func.entry_address()));
-
-  // read all the blocks from this function
-  for(int i = 0; i < func.blocks_size(); i++)
-  {
-    natF->add_block(deserializeBlock(func.blocks(i), decoder));
-  }
-
+  
   // read any recovered function local variables from this function
   for(int i = 0; i < func.stackvars_size(); i++)
   {
     natF->add_stackvar(deserializeStackVar(func.stackvars(i), decoder));
+  }
+
+  // read all the blocks from this function
+  for(int i = 0; i < func.blocks_size(); i++)
+  {
+    natF->add_block(deserializeBlock(func.blocks(i), decoder, natF->get_stackvars()));
   }
 
   natF->compute_graph();
