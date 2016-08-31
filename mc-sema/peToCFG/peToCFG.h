@@ -271,6 +271,11 @@ class Inst {
     }
   }
     
+  NativeVarPtr get_mem_var(void)
+  {
+      return this->mem_var;
+  }
+    
   void set_mem_var(NativeVarPtr v)
   {
       this->mem_var = v;
@@ -570,12 +575,15 @@ class NativeVar {
     std::string         name;
     std::string         type; // TODO: something cleverer than string. for now it's just ida_type wholesale.
     std::list<uint64_t>  refs;
+    llvm::Instruction    *llvm_var;
     llvm::MCInstPrinter *MyPrinter;
     public:
     NativeVar(uint64_t size, std::string name, std::string type, llvm::MCInstPrinter *printer) : size(size), name(name), type(type), MyPrinter(printer) {}
     uint64_t get_size(void) { return this->size; }
     void add_ref(uint64_t ea) { this->refs.push_back(ea); }
     std::list<uint64_t> &get_refs(void) { return this->refs; }
+    llvm::Instruction *get_llvm_var(void) { return this->llvm_var; }
+    void set_llvm_var(llvm::Instruction *v) { this->llvm_var = v; }
     std::string print_var(void);
     std::string get_name(void) { return this->name; }
     std::string get_type(void) { return this->type; }

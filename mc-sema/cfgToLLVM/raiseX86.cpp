@@ -1210,6 +1210,7 @@ void allocateStackLocals(Function *F, NativeFunctionPtr func) {
     {
       cout << "Inserting var " << (*sv)->get_name() << ", size " << (*sv)->get_size() << " (ida_type " << (*sv)->get_type() <<")" << std::endl;
       Instruction *v = new AllocaInst(t, (*sv)->get_name(), cur);
+      (*sv)->set_llvm_var(v);
       cur = v;
     }
   }
