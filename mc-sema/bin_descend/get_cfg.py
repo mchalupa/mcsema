@@ -2273,6 +2273,9 @@ if __name__ == "__main__":
 
         recoverCfg(eps, outf, args.exports_are_apis, args.stack_vars)
 
+
+        recoverCfg(eps, outf, args.exports_are_apis, args.stack_vars)
+
     except Exception as e:
         DEBUG(traceback.format_exc())
     
