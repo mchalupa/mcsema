@@ -737,7 +737,7 @@ using namespace x86;
 
 // do any instruction preprocessing/conversion
 // before moving on to translation.
-// currently used to turn non-conforming jump talbles
+// currently used to turn non-conforming jump tables
 // into data sections
 //
 static void preprocessInstruction(
