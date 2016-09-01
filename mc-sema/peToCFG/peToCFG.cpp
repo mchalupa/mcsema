@@ -293,7 +293,7 @@ Inst::CFGRefType deserRefType(::Instruction::RefType k)
   }
 }
 
-InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder, std::list<NativeStackVarPtr> stackvars)
+InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder, const std::list<NativeStackVarPtr> &stackvars)
 {
   VA                      addr = inst.inst_addr();
   boost::int64_t          tr_tgt = inst.true_target();
@@ -357,20 +357,18 @@ InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder, std
   }
 
   // check for recovered stack var
-  for(std::list<NativeStackVarPtr>::iterator i = stackvars.begin(),
-      ie = stackvars.end();
-      i != ie;
-      i++)
+  for(auto i : stackvars)
   {
-    std::list<uint64_t> refs = (*i)->get_refs();
-    for(std::list<uint64_t>::iterator r = refs.begin(),
-        re = refs.end();
-        r != re;
-        r++)
+    std::list<uint64_t> refs = i->get_refs();
+//    for(std::list<uint64_t>::iterator r = refs.begin(),
+//        re = refs.end();
+//        r != re;
+//        r++)
+    for(auto r : refs)
     {
-      if(*r == addr)
+      if(r == addr)
       {
-        ip->set_mem_var(*i);
+        ip->set_mem_var(i);
       }
     }
   }
@@ -420,7 +418,7 @@ InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder, std
 
 NativeBlockPtr  deserializeBlock( const ::Block   &block,
                                   LLVMByteDecoder &decoder,
-                                  std::list<NativeStackVarPtr> stackvars)
+                                  const std::list<NativeStackVarPtr> &stackvars)
 {
   NativeBlockPtr  natB =
     NativeBlockPtr(new NativeBlock(block.base_address(), decoder.getPrinter()));
