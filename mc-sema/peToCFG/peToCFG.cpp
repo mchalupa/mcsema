@@ -364,26 +364,26 @@ InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder,
       rt = deserRefType(inst.mem_ref_type());
     }
 
-      // check for recovered stack var
-      for(std::list<NativeStackVarPtr>::iterator i = stackvars.begin(),
-          ie = stackvars.end();
-          i != ie;
-          i++)
-      {
-        std::list<uint64_t> refs = (*i)->get_refs();
-        for(std::list<uint64_t>::iterator r = refs.begin(),
-            re = refs.end();
-            r != re;
-            r++)
-        {
-          if(*r == addr)
-          {
-            ip->set_mem_var(*i);
-          }
-        }
-      }
-
       ip->set_ref_reloc_type(Inst::MEMRef, ref, ro, rt);
+  }
+
+  // check for recovered stack var
+  for(std::list<NativeStackVarPtr>::iterator i = stackvars.begin(),
+      ie = stackvars.end();
+      i != ie;
+      i++)
+  {
+    std::list<uint64_t> refs = (*i)->get_refs();
+    for(std::list<uint64_t>::iterator r = refs.begin(),
+        re = refs.end();
+        r != re;
+        r++)
+    {
+      if(*r == addr)
+      {
+        ip->set_mem_var(*i);
+      }
+    }
   }
 
   if (inst.has_jump_table()) {
