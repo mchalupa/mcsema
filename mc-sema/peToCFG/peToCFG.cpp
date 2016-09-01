@@ -302,11 +302,11 @@ static ExternalCodeRefPtr getExternal(const std::string &s, const list<ExternalC
     return ExternalCodeRefPtr();
 }
 
-InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder,
-                                const list<ExternalCodeRefPtr> &extcode) {
-  VA addr = inst.inst_addr();
-  boost::int64_t tr_tgt = inst.true_target();
-  boost::int64_t fa_tgt = inst.false_target();
+InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder, const std::list<NativeStackVarPtr> &stackvars)
+{
+  VA                      addr = inst.inst_addr();
+  boost::int64_t          tr_tgt = inst.true_target();
+  boost::int64_t          fa_tgt = inst.false_target();
   //uint32_t         len = inst.inst_len();
   string instData = inst.inst_bytes();
   vector<uint8_t> bytes(instData.begin(), instData.end());
@@ -368,20 +368,18 @@ InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder,
   }
 
   // check for recovered stack var
-  for(std::list<NativeStackVarPtr>::iterator i = stackvars.begin(),
-      ie = stackvars.end();
-      i != ie;
-      i++)
+  for(auto i : stackvars)
   {
-    std::list<uint64_t> refs = (*i)->get_refs();
-    for(std::list<uint64_t>::iterator r = refs.begin(),
-        re = refs.end();
-        r != re;
-        r++)
+    std::list<uint64_t> refs = i->get_refs();
+//    for(std::list<uint64_t>::iterator r = refs.begin(),
+//        re = refs.end();
+//        r != re;
+//        r++)
+    for(auto r : refs)
     {
-      if(*r == addr)
+      if(r == addr)
       {
-        ip->set_mem_var(*i);
+        ip->set_mem_var(i);
       }
     }
   }
