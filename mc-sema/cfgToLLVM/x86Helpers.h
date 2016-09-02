@@ -250,6 +250,11 @@ static inline Value *ADDR_NOREF_IMPL(NativeModulePtr natM, llvm::BasicBlock *b, 
         return addrInt;
     }
 
+    if(ip->has_mem_var) {
+      // TODO sanity check
+      return ip->get_mem_var()->get_llvm_var();
+    }
+
     if(getPointerSize(M) == Pointer32) {
 		return x86::getAddrFromExpr(b, natM, inst.getOperand(x+0), inst.getOperand(x+1), inst.getOperand(x+2), inst.getOperand(x+3).getImm(), inst.getOperand(x+4), false);
     } else {

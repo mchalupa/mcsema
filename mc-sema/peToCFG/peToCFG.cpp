@@ -360,10 +360,6 @@ InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder, con
   for(auto i : stackvars)
   {
     std::list<uint64_t> refs = i->get_refs();
-//    for(std::list<uint64_t>::iterator r = refs.begin(),
-//        re = refs.end();
-//        r != re;
-//        r++)
     for(auto r : refs)
     {
       if(r == addr)

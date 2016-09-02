@@ -572,11 +572,11 @@ void allocateStackLocals(Function *F, NativeFunctionPtr func) {
   Instruction *cur = begin->getFirstNonPHI();
   std::list<NativeStackVarPtr> stackvars = func->get_stackvars();
   Type *t;
-  for(std::list<NativeStackVarPtr>::iterator sv = stackvars.begin(); sv != stackvars.end(); ++sv)
+  for(auto s : stackvars)
   {
     // form type
     // TODO just ints for now; take into account type 
-    switch((*sv)->get_size())
+    switch(s->get_size())
     {
       t = NULL; // debugging; probably should choose a better failure value
       case 1:
@@ -588,6 +588,9 @@ void allocateStackLocals(Function *F, NativeFunctionPtr func) {
       case 4:
         t = Type::getInt32Ty(F->getContext());
         break;
+      case 8:
+        t = Type::getInt64Ty(F->getContext());
+        break;
       default:
         // ignore this one
         continue;
@@ -595,9 +598,9 @@ void allocateStackLocals(Function *F, NativeFunctionPtr func) {
     // alloca
     if(t != NULL)
     {
-      cout << "Inserting var " << (*sv)->get_name() << ", size " << (*sv)->get_size() << " (ida_type " << (*sv)->get_type() <<")" << std::endl;
-      Instruction *v = new AllocaInst(t, (*sv)->get_name(), cur);
-      (*sv)->set_llvm_var(v);
+      cout << "Inserting var " << s->get_name() << ", size " << s->get_size() << " (ida_type " << s->get_type() <<")" << std::endl;
+      Instruction *v = new AllocaInst(t, s->get_name(), cur);
+      s->set_llvm_var(v);
       cur = v;
     }
   }
