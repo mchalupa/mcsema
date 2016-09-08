@@ -512,6 +512,7 @@ ExternalCodeRefPtr deserializeExt(const ::ExternalFunction &f)
 
   ExternalCodeRefPtr ext =
     ExternalCodeRefPtr(new ExternalCodeRef(symName, argCount, c, retTy));
+  ext->setWeak(f.is_weak());
 
   return ext;
 }
@@ -523,6 +524,7 @@ ExternalDataRefPtr deserializeExtData(const ::ExternalData &ed)
 
   ExternalDataRefPtr ext =
     ExternalDataRefPtr(new ExternalDataRef(symName, data_size));
+  ext->setWeak(ed.is_weak());
 
   return ext;
 }

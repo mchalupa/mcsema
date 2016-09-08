@@ -264,12 +264,13 @@ void protobuf_AssignDesc_CFG_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Function));
   ExternalFunction_descriptor_ = file->message_type(8);
-  static const int ExternalFunction_offsets_[6] = {
+  static const int ExternalFunction_offsets_[7] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ExternalFunction, symbol_name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ExternalFunction, calling_convention_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ExternalFunction, has_return_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ExternalFunction, no_return_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ExternalFunction, argument_count_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ExternalFunction, is_weak_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ExternalFunction, signature_),
   };
   ExternalFunction_reflection_ =
@@ -285,9 +286,10 @@ void protobuf_AssignDesc_CFG_2eproto() {
       sizeof(ExternalFunction));
   ExternalFunction_CallingConvention_descriptor_ = ExternalFunction_descriptor_->enum_type(0);
   ExternalData_descriptor_ = file->message_type(9);
-  static const int ExternalData_offsets_[2] = {
+  static const int ExternalData_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ExternalData, symbol_name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ExternalData, data_size_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ExternalData, is_weak_),
   };
   ExternalData_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -760,95 +762,96 @@ void protobuf_AddDesc_CFG_2eproto() {
     "5\n\010StackVar\022\026\n\003var\030\001 \002(\0132\t.Variable\022\021\n\ts"
     "p_offset\030\002 \002(\003\"W\n\010Function\022\026\n\006blocks\030\001 \003"
     "(\0132\006.Block\022\025\n\rentry_address\030\002 \002(\003\022\034\n\tsta"
-    "ckvars\030\003 \003(\0132\t.StackVar\"\203\002\n\020ExternalFunc"
+    "ckvars\030\003 \003(\0132\t.StackVar\"\224\002\n\020ExternalFunc"
     "tion\022\023\n\013symbol_name\030\001 \002(\t\022\?\n\022calling_con"
     "vention\030\002 \002(\0162#.ExternalFunction.Calling"
     "Convention\022\022\n\nhas_return\030\003 \002(\010\022\021\n\tno_ret"
-    "urn\030\004 \002(\010\022\026\n\016argument_count\030\005 \002(\005\022\021\n\tsig"
-    "nature\030\006 \001(\t\"G\n\021CallingConvention\022\021\n\rCal"
-    "lerCleanup\020\000\022\021\n\rCalleeCleanup\020\001\022\014\n\010FastC"
-    "all\020\002\"6\n\014ExternalData\022\023\n\013symbol_name\030\001 \002"
-    "(\t\022\021\n\tdata_size\030\002 \002(\005\"L\n\nDataSymbol\022\024\n\014b"
-    "ase_address\030\001 \002(\003\022\023\n\013symbol_name\030\002 \002(\t\022\023"
-    "\n\013symbol_size\030\003 \002(\005\"[\n\004Data\022\024\n\014base_addr"
-    "ess\030\001 \002(\003\022\014\n\004data\030\002 \002(\014\022\034\n\007symbols\030\003 \003(\013"
-    "2\013.DataSymbol\022\021\n\tread_only\030\004 \002(\010\"u\n\020Entr"
-    "ySymbolExtra\022\022\n\nentry_argc\030\001 \002(\005\0228\n\013entr"
-    "y_cconv\030\002 \002(\0162#.ExternalFunction.Calling"
-    "Convention\022\023\n\013does_return\030\003 \002(\010\"`\n\013Entry"
-    "Symbol\022\022\n\nentry_name\030\001 \002(\t\022\025\n\rentry_addr"
-    "ess\030\002 \002(\003\022&\n\013entry_extra\030\003 \001(\0132\021.EntrySy"
-    "mbolExtra\"\316\001\n\006Module\022!\n\016internal_funcs\030\001"
-    " \003(\0132\t.Function\022)\n\016external_funcs\030\002 \003(\0132"
-    "\021.ExternalFunction\022\034\n\rinternal_data\030\003 \003("
-    "\0132\005.Data\022\023\n\013module_name\030\004 \002(\t\022\035\n\007entries"
-    "\030\005 \003(\0132\014.EntrySymbol\022$\n\rexternal_data\030\006 "
-    "\003(\0132\r.ExternalData\"l\n\007Edge_64\022\r\n\005value\030\001"
-    " \002(\003\022\033\n\004kind\030\002 \002(\0162\r.Edge_64.Kind\022\r\n\005lab"
-    "el\030\003 \001(\010\"&\n\004Kind\022\013\n\007Unknown\020\000\022\007\n\003May\020\001\022\010"
-    "\n\004Must\020\002\"l\n\007Edge_32\022\r\n\005value\030\001 \002(\005\022\033\n\004ki"
-    "nd\030\002 \002(\0162\r.Edge_32.Kind\022\r\n\005label\030\003 \001(\010\"&"
-    "\n\004Kind\022\013\n\007Unknown\020\000\022\007\n\003May\020\001\022\010\n\004Must\020\002\"\205"
-    "\004\n\034Annotated_Branch_Instruction\022\?\n\021branc"
-    "h_instr_name\030\001 \002(\0162$.Annotated_Branch_In"
-    "struction.Branch\022\023\n\013is_resolved\030\002 \002(\010\022\023\n"
-    "\013is_indirect\030\003 \002(\010\022\026\n\016is_conditional\030\004 \002"
-    "(\010\022\017\n\007is_leaf\030\005 \002(\010\022\033\n\ttarget_to\030\006 \003(\0132\010"
-    ".Edge_64\022%\n\005instr\030\007 \002(\0132\026.Annotated_Inst"
-    "ruction\022\033\n\023abstract_expression\030\010 \001(\t\"\357\001\n"
-    "\006Branch\022\013\n\007Unknown\020\000\022\007\n\003jmp\020\001\022\010\n\004ljmp\020\002\022"
-    "\006\n\002jo\020\003\022\007\n\003jno\020\004\022\006\n\002jb\020\005\022\007\n\003jae\020\006\022\006\n\002je\020"
-    "\007\022\007\n\003jne\020\010\022\007\n\003jbe\020\t\022\006\n\002ja\020\n\022\006\n\002js\020\013\022\007\n\003j"
-    "ns\020\014\022\006\n\002jp\020\r\022\007\n\003jnp\020\016\022\006\n\002jl\020\017\022\007\n\003jge\020\020\022\007"
-    "\n\003jle\020\021\022\006\n\002jg\020\022\022\n\n\006loopne\020\023\022\t\n\005loope\020\024\022\010"
-    "\n\004loop\020\025\022\t\n\005jCcxz\020\026\022\007\n\003ret\020\027\022\010\n\004call\020\030\"\270"
-    "\003\n\025Annotated_Instruction\022\022\n\ninstr_name\030\001"
-    " \002(\t\022\024\n\014instr_string\030\002 \002(\t\022\021\n\tinst_addr\030"
-    "\003 \002(\003\022\020\n\010inst_len\030\004 \002(\005\022\020\n\010op_count\030\005 \002("
-    "\005\022\025\n\rinst_addr_hex\030\006 \001(\t\022\035\n\025is_branch_in"
-    "struction\030\007 \002(\010\0220\n\010argument\030\010 \003(\0132\036.Anno"
-    "tated_Instruction.Operand\022 \n\016referered_f"
-    "rom\030\t \003(\0132\010.Edge_64\032\263\001\n\007Operand\022\013\n\003pos\030\001"
-    " \002(\005\0229\n\004type\030\002 \002(\0162+.Annotated_Instructi"
-    "on.Operand.Operand_Type\022\r\n\005value\030\003 \001(\t\"Q"
-    "\n\014Operand_Type\022\013\n\007Unknown\020\000\022\r\n\tImmediate"
-    "\020\001\022\014\n\010Register\020\002\022\n\n\006Memory\020\003\022\013\n\007Address\020"
-    "\004\"\251\003\n\025Annotated_Register_32\022-\n\004name\030\001 \002("
-    "\0162\037.Annotated_Register_32.Register\022\024\n\014us"
-    "ed_at_addr\030\002 \002(\003\022\030\n\020used_at_addr_hex\030\003 \001"
-    "(\t\022\027\n\005value\030\007 \003(\0132\010.Edge_32\022-\n\004fact\030\010 \002("
-    "\0132\037.Annotated_Register_32.Property\022\033\n\023ab"
-    "stract_expression\030\t \001(\t\032*\n\010Property\022\017\n\007U"
-    "nknown\030\001 \002(\010\022\r\n\005Alive\030\002 \001(\010\"\237\001\n\010Register"
-    "\022\013\n\007Unknown\020\000\022\007\n\003eax\020\001\022\007\n\003ecx\020\002\022\007\n\003edx\020\003"
-    "\022\007\n\003ebx\020\004\022\007\n\003esp\020\005\022\007\n\003ebp\020\006\022\007\n\003esi\020\007\022\007\n\003"
-    "edi\020\010\022\007\n\003eip\020\t\022\013\n\007fs_base\020\n\022\013\n\007gs_base\020\013"
-    "\022\007\n\003gtd\020\014\022\007\n\003ldt\020\r\022\t\n\005mxcsr\020\016\"\344\003\n\025Annota"
-    "ted_Register_64\022-\n\004name\030\001 \002(\0162\037.Annotate"
-    "d_Register_64.Register\022\024\n\014used_at_addr\030\002"
-    " \002(\003\022\030\n\020used_at_addr_hex\030\003 \001(\t\022\027\n\005value\030"
-    "\004 \003(\0132\010.Edge_64\022-\n\004fact\030\005 \002(\0132\037.Annotate"
-    "d_Register_64.Property\022\033\n\023abstract_expre"
-    "ssion\030\006 \001(\t\032*\n\010Property\022\017\n\007Unknown\030\001 \002(\010"
-    "\022\r\n\005Alive\030\002 \001(\010\"\332\001\n\010Register\022\013\n\007Unknown\020"
-    "\000\022\007\n\003rax\020\n\022\007\n\003rcx\020\013\022\007\n\003rdx\020\014\022\007\n\003rbx\020\r\022\007\n"
-    "\003rsp\020\016\022\007\n\003rbp\020\017\022\007\n\003rsi\020\020\022\007\n\003rdi\020\021\022\007\n\003rip"
-    "\020\022\022\006\n\002r8\020\023\022\006\n\002r9\020\024\022\007\n\003r10\020\025\022\007\n\003r11\020\026\022\007\n\003"
-    "r12\020\027\022\007\n\003r13\020\030\022\007\n\003r14\020\031\022\007\n\003r15\020\032\022\013\n\007fs_b"
-    "ase\020\033\022\013\n\007gs_base\020\034\022\007\n\003gdt\020\035\022\007\n\003ldt\020\036\"\215\002\n"
-    "\022Annotated_Function\022\014\n\004name\030\001 \002(\t\022\025\n\rsta"
-    "rt_at_addr\030\002 \002(\003\022\031\n\021start_at_addr_hex\030\003 "
-    "\001(\t\022\023\n\013end_at_addr\030\004 \001(\003\022\027\n\017end_at_addr_"
-    "hex\030\005 \001(\t\022&\n\006prolog\030\006 \003(\0132\026.Annotated_In"
-    "struction\022&\n\006epilog\030\007 \003(\0132\026.Annotated_In"
-    "struction\022 \n\016referered_from\030\010 \003(\0132\010.Edge"
-    "_64\022\027\n\005calls\030\t \003(\0132\010.Edge_64\"\334\001\n\013Disasse"
-    "mbly\022%\n\005instr\030\001 \003(\0132\026.Annotated_Instruct"
-    "ion\0223\n\014branch_instr\030\002 \003(\0132\035.Annotated_Br"
-    "anch_Instruction\022&\n\006reg_32\030\003 \003(\0132\026.Annot"
-    "ated_Register_32\022&\n\006reg_64\030\004 \003(\0132\026.Annot"
-    "ated_Register_64\022!\n\004func\030\005 \003(\0132\023.Annotat"
-    "ed_Function", 4531);
+    "urn\030\004 \002(\010\022\026\n\016argument_count\030\005 \002(\005\022\017\n\007is_"
+    "weak\030\006 \002(\010\022\021\n\tsignature\030\007 \001(\t\"G\n\021Calling"
+    "Convention\022\021\n\rCallerCleanup\020\000\022\021\n\rCalleeC"
+    "leanup\020\001\022\014\n\010FastCall\020\002\"G\n\014ExternalData\022\023"
+    "\n\013symbol_name\030\001 \002(\t\022\021\n\tdata_size\030\002 \002(\005\022\017"
+    "\n\007is_weak\030\003 \002(\010\"L\n\nDataSymbol\022\024\n\014base_ad"
+    "dress\030\001 \002(\003\022\023\n\013symbol_name\030\002 \002(\t\022\023\n\013symb"
+    "ol_size\030\003 \002(\005\"[\n\004Data\022\024\n\014base_address\030\001 "
+    "\002(\003\022\014\n\004data\030\002 \002(\014\022\034\n\007symbols\030\003 \003(\0132\013.Dat"
+    "aSymbol\022\021\n\tread_only\030\004 \002(\010\"u\n\020EntrySymbo"
+    "lExtra\022\022\n\nentry_argc\030\001 \002(\005\0228\n\013entry_ccon"
+    "v\030\002 \002(\0162#.ExternalFunction.CallingConven"
+    "tion\022\023\n\013does_return\030\003 \002(\010\"`\n\013EntrySymbol"
+    "\022\022\n\nentry_name\030\001 \002(\t\022\025\n\rentry_address\030\002 "
+    "\002(\003\022&\n\013entry_extra\030\003 \001(\0132\021.EntrySymbolEx"
+    "tra\"\316\001\n\006Module\022!\n\016internal_funcs\030\001 \003(\0132\t"
+    ".Function\022)\n\016external_funcs\030\002 \003(\0132\021.Exte"
+    "rnalFunction\022\034\n\rinternal_data\030\003 \003(\0132\005.Da"
+    "ta\022\023\n\013module_name\030\004 \002(\t\022\035\n\007entries\030\005 \003(\013"
+    "2\014.EntrySymbol\022$\n\rexternal_data\030\006 \003(\0132\r."
+    "ExternalData\"l\n\007Edge_64\022\r\n\005value\030\001 \002(\003\022\033"
+    "\n\004kind\030\002 \002(\0162\r.Edge_64.Kind\022\r\n\005label\030\003 \001"
+    "(\010\"&\n\004Kind\022\013\n\007Unknown\020\000\022\007\n\003May\020\001\022\010\n\004Must"
+    "\020\002\"l\n\007Edge_32\022\r\n\005value\030\001 \002(\005\022\033\n\004kind\030\002 \002"
+    "(\0162\r.Edge_32.Kind\022\r\n\005label\030\003 \001(\010\"&\n\004Kind"
+    "\022\013\n\007Unknown\020\000\022\007\n\003May\020\001\022\010\n\004Must\020\002\"\205\004\n\034Ann"
+    "otated_Branch_Instruction\022\?\n\021branch_inst"
+    "r_name\030\001 \002(\0162$.Annotated_Branch_Instruct"
+    "ion.Branch\022\023\n\013is_resolved\030\002 \002(\010\022\023\n\013is_in"
+    "direct\030\003 \002(\010\022\026\n\016is_conditional\030\004 \002(\010\022\017\n\007"
+    "is_leaf\030\005 \002(\010\022\033\n\ttarget_to\030\006 \003(\0132\010.Edge_"
+    "64\022%\n\005instr\030\007 \002(\0132\026.Annotated_Instructio"
+    "n\022\033\n\023abstract_expression\030\010 \001(\t\"\357\001\n\006Branc"
+    "h\022\013\n\007Unknown\020\000\022\007\n\003jmp\020\001\022\010\n\004ljmp\020\002\022\006\n\002jo\020"
+    "\003\022\007\n\003jno\020\004\022\006\n\002jb\020\005\022\007\n\003jae\020\006\022\006\n\002je\020\007\022\007\n\003j"
+    "ne\020\010\022\007\n\003jbe\020\t\022\006\n\002ja\020\n\022\006\n\002js\020\013\022\007\n\003jns\020\014\022\006"
+    "\n\002jp\020\r\022\007\n\003jnp\020\016\022\006\n\002jl\020\017\022\007\n\003jge\020\020\022\007\n\003jle\020"
+    "\021\022\006\n\002jg\020\022\022\n\n\006loopne\020\023\022\t\n\005loope\020\024\022\010\n\004loop"
+    "\020\025\022\t\n\005jCcxz\020\026\022\007\n\003ret\020\027\022\010\n\004call\020\030\"\270\003\n\025Ann"
+    "otated_Instruction\022\022\n\ninstr_name\030\001 \002(\t\022\024"
+    "\n\014instr_string\030\002 \002(\t\022\021\n\tinst_addr\030\003 \002(\003\022"
+    "\020\n\010inst_len\030\004 \002(\005\022\020\n\010op_count\030\005 \002(\005\022\025\n\ri"
+    "nst_addr_hex\030\006 \001(\t\022\035\n\025is_branch_instruct"
+    "ion\030\007 \002(\010\0220\n\010argument\030\010 \003(\0132\036.Annotated_"
+    "Instruction.Operand\022 \n\016referered_from\030\t "
+    "\003(\0132\010.Edge_64\032\263\001\n\007Operand\022\013\n\003pos\030\001 \002(\005\0229"
+    "\n\004type\030\002 \002(\0162+.Annotated_Instruction.Ope"
+    "rand.Operand_Type\022\r\n\005value\030\003 \001(\t\"Q\n\014Oper"
+    "and_Type\022\013\n\007Unknown\020\000\022\r\n\tImmediate\020\001\022\014\n\010"
+    "Register\020\002\022\n\n\006Memory\020\003\022\013\n\007Address\020\004\"\251\003\n\025"
+    "Annotated_Register_32\022-\n\004name\030\001 \002(\0162\037.An"
+    "notated_Register_32.Register\022\024\n\014used_at_"
+    "addr\030\002 \002(\003\022\030\n\020used_at_addr_hex\030\003 \001(\t\022\027\n\005"
+    "value\030\007 \003(\0132\010.Edge_32\022-\n\004fact\030\010 \002(\0132\037.An"
+    "notated_Register_32.Property\022\033\n\023abstract"
+    "_expression\030\t \001(\t\032*\n\010Property\022\017\n\007Unknown"
+    "\030\001 \002(\010\022\r\n\005Alive\030\002 \001(\010\"\237\001\n\010Register\022\013\n\007Un"
+    "known\020\000\022\007\n\003eax\020\001\022\007\n\003ecx\020\002\022\007\n\003edx\020\003\022\007\n\003eb"
+    "x\020\004\022\007\n\003esp\020\005\022\007\n\003ebp\020\006\022\007\n\003esi\020\007\022\007\n\003edi\020\010\022"
+    "\007\n\003eip\020\t\022\013\n\007fs_base\020\n\022\013\n\007gs_base\020\013\022\007\n\003gt"
+    "d\020\014\022\007\n\003ldt\020\r\022\t\n\005mxcsr\020\016\"\344\003\n\025Annotated_Re"
+    "gister_64\022-\n\004name\030\001 \002(\0162\037.Annotated_Regi"
+    "ster_64.Register\022\024\n\014used_at_addr\030\002 \002(\003\022\030"
+    "\n\020used_at_addr_hex\030\003 \001(\t\022\027\n\005value\030\004 \003(\0132"
+    "\010.Edge_64\022-\n\004fact\030\005 \002(\0132\037.Annotated_Regi"
+    "ster_64.Property\022\033\n\023abstract_expression\030"
+    "\006 \001(\t\032*\n\010Property\022\017\n\007Unknown\030\001 \002(\010\022\r\n\005Al"
+    "ive\030\002 \001(\010\"\332\001\n\010Register\022\013\n\007Unknown\020\000\022\007\n\003r"
+    "ax\020\n\022\007\n\003rcx\020\013\022\007\n\003rdx\020\014\022\007\n\003rbx\020\r\022\007\n\003rsp\020\016"
+    "\022\007\n\003rbp\020\017\022\007\n\003rsi\020\020\022\007\n\003rdi\020\021\022\007\n\003rip\020\022\022\006\n\002"
+    "r8\020\023\022\006\n\002r9\020\024\022\007\n\003r10\020\025\022\007\n\003r11\020\026\022\007\n\003r12\020\027\022"
+    "\007\n\003r13\020\030\022\007\n\003r14\020\031\022\007\n\003r15\020\032\022\013\n\007fs_base\020\033\022"
+    "\013\n\007gs_base\020\034\022\007\n\003gdt\020\035\022\007\n\003ldt\020\036\"\215\002\n\022Annot"
+    "ated_Function\022\014\n\004name\030\001 \002(\t\022\025\n\rstart_at_"
+    "addr\030\002 \002(\003\022\031\n\021start_at_addr_hex\030\003 \001(\t\022\023\n"
+    "\013end_at_addr\030\004 \001(\003\022\027\n\017end_at_addr_hex\030\005 "
+    "\001(\t\022&\n\006prolog\030\006 \003(\0132\026.Annotated_Instruct"
+    "ion\022&\n\006epilog\030\007 \003(\0132\026.Annotated_Instruct"
+    "ion\022 \n\016referered_from\030\010 \003(\0132\010.Edge_64\022\027\n"
+    "\005calls\030\t \003(\0132\010.Edge_64\"\334\001\n\013Disassembly\022%"
+    "\n\005instr\030\001 \003(\0132\026.Annotated_Instruction\0223\n"
+    "\014branch_instr\030\002 \003(\0132\035.Annotated_Branch_I"
+    "nstruction\022&\n\006reg_32\030\003 \003(\0132\026.Annotated_R"
+    "egister_32\022&\n\006reg_64\030\004 \003(\0132\026.Annotated_R"
+    "egister_64\022!\n\004func\030\005 \003(\0132\023.Annotated_Fun"
+    "ction", 4565);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "CFG.proto", &protobuf_RegisterTypes);
   JumpTbl::default_instance_ = new JumpTbl();
@@ -3918,6 +3921,7 @@ const int ExternalFunction::kCallingConventionFieldNumber;
 const int ExternalFunction::kHasReturnFieldNumber;
 const int ExternalFunction::kNoReturnFieldNumber;
 const int ExternalFunction::kArgumentCountFieldNumber;
+const int ExternalFunction::kIsWeakFieldNumber;
 const int ExternalFunction::kSignatureFieldNumber;
 #endif  // !_MSC_VER
 
@@ -3942,6 +3946,7 @@ void ExternalFunction::SharedCtor() {
   has_return_ = false;
   no_return_ = false;
   argument_count_ = 0;
+  is_weak_ = false;
   signature_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
@@ -3993,6 +3998,7 @@ void ExternalFunction::Clear() {
     has_return_ = false;
     no_return_ = false;
     argument_count_ = 0;
+    is_weak_ = false;
     if (has_signature()) {
       if (signature_ != &::google::protobuf::internal::kEmptyString) {
         signature_->clear();
@@ -4090,12 +4096,28 @@ bool ExternalFunction::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(50)) goto parse_signature;
+        if (input->ExpectTag(48)) goto parse_is_weak;
         break;
       }
 
-      // optional string signature = 6;
+      // required bool is_weak = 6;
       case 6: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_is_weak:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &is_weak_)));
+          set_has_is_weak();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(58)) goto parse_signature;
+        break;
+      }
+
+      // optional string signature = 7;
+      case 7: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
          parse_signature:
@@ -4159,13 +4181,18 @@ void ExternalFunction::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->argument_count(), output);
   }
 
-  // optional string signature = 6;
+  // required bool is_weak = 6;
+  if (has_is_weak()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(6, this->is_weak(), output);
+  }
+
+  // optional string signature = 7;
   if (has_signature()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->signature().data(), this->signature().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
     ::google::protobuf::internal::WireFormatLite::WriteString(
-      6, this->signature(), output);
+      7, this->signature(), output);
   }
 
   if (!unknown_fields().empty()) {
@@ -4207,14 +4234,19 @@ void ExternalFunction::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->argument_count(), target);
   }
 
-  // optional string signature = 6;
+  // required bool is_weak = 6;
+  if (has_is_weak()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(6, this->is_weak(), target);
+  }
+
+  // optional string signature = 7;
   if (has_signature()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->signature().data(), this->signature().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        6, this->signature(), target);
+        7, this->signature(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -4258,7 +4290,12 @@ int ExternalFunction::ByteSize() const {
           this->argument_count());
     }
 
-    // optional string signature = 6;
+    // required bool is_weak = 6;
+    if (has_is_weak()) {
+      total_size += 1 + 1;
+    }
+
+    // optional string signature = 7;
     if (has_signature()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
@@ -4307,6 +4344,9 @@ void ExternalFunction::MergeFrom(const ExternalFunction& from) {
     if (from.has_argument_count()) {
       set_argument_count(from.argument_count());
     }
+    if (from.has_is_weak()) {
+      set_is_weak(from.is_weak());
+    }
     if (from.has_signature()) {
       set_signature(from.signature());
     }
@@ -4327,7 +4367,7 @@ void ExternalFunction::CopyFrom(const ExternalFunction& from) {
 }
 
 bool ExternalFunction::IsInitialized() const {
-  if ((_has_bits_[0] & 0x0000001f) != 0x0000001f) return false;
+  if ((_has_bits_[0] & 0x0000003f) != 0x0000003f) return false;
 
   return true;
 }
@@ -4339,6 +4379,7 @@ void ExternalFunction::Swap(ExternalFunction* other) {
     std::swap(has_return_, other->has_return_);
     std::swap(no_return_, other->no_return_);
     std::swap(argument_count_, other->argument_count_);
+    std::swap(is_weak_, other->is_weak_);
     std::swap(signature_, other->signature_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
@@ -4360,6 +4401,7 @@ void ExternalFunction::Swap(ExternalFunction* other) {
 #ifndef _MSC_VER
 const int ExternalData::kSymbolNameFieldNumber;
 const int ExternalData::kDataSizeFieldNumber;
+const int ExternalData::kIsWeakFieldNumber;
 #endif  // !_MSC_VER
 
 ExternalData::ExternalData()
@@ -4380,6 +4422,7 @@ void ExternalData::SharedCtor() {
   _cached_size_ = 0;
   symbol_name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   data_size_ = 0;
+  is_weak_ = false;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -4424,6 +4467,7 @@ void ExternalData::Clear() {
       }
     }
     data_size_ = 0;
+    is_weak_ = false;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -4463,6 +4507,22 @@ bool ExternalData::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(24)) goto parse_is_weak;
+        break;
+      }
+
+      // required bool is_weak = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_is_weak:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &is_weak_)));
+          set_has_is_weak();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -4499,6 +4559,11 @@ void ExternalData::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->data_size(), output);
   }
 
+  // required bool is_weak = 3;
+  if (has_is_weak()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(3, this->is_weak(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -4520,6 +4585,11 @@ void ExternalData::SerializeWithCachedSizes(
   // required int32 data_size = 2;
   if (has_data_size()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->data_size(), target);
+  }
+
+  // required bool is_weak = 3;
+  if (has_is_weak()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(3, this->is_weak(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -4545,6 +4615,11 @@ int ExternalData::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
           this->data_size());
+    }
+
+    // required bool is_weak = 3;
+    if (has_is_weak()) {
+      total_size += 1 + 1;
     }
 
   }
@@ -4580,6 +4655,9 @@ void ExternalData::MergeFrom(const ExternalData& from) {
     if (from.has_data_size()) {
       set_data_size(from.data_size());
     }
+    if (from.has_is_weak()) {
+      set_is_weak(from.is_weak());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -4597,7 +4675,7 @@ void ExternalData::CopyFrom(const ExternalData& from) {
 }
 
 bool ExternalData::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+  if ((_has_bits_[0] & 0x00000007) != 0x00000007) return false;
 
   return true;
 }
@@ -4606,6 +4684,7 @@ void ExternalData::Swap(ExternalData* other) {
   if (other != this) {
     std::swap(symbol_name_, other->symbol_name_);
     std::swap(data_size_, other->data_size_);
+    std::swap(is_weak_, other->is_weak_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

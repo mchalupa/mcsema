@@ -1190,7 +1190,7 @@ void dataSectionToTypesContents(const list<DataSection> &globaldata,
 
         Constant *final_val  = nullptr;
 
-        GlobalVariable *ext_v = M->getNamedGlobal(func_addr_str);
+        GlobalValue *ext_v = M->getNamedValue(func_addr_str);
 
         if(ext_v != nullptr && isa<Function>(ext_v)) {
             final_val = getPtrSizedValue(M, ext_v, dsec_itr->getSize());
@@ -1200,7 +1200,7 @@ void dataSectionToTypesContents(const list<DataSection> &globaldata,
             //cout << "External data" << sym_name << " has type: " << final_val->getType() << "\n";
             // assume ext data
         } else {
-            TASSERT(ext_v != nullptr, "Could not find external: " + sym_name);
+            TASSERT(ext_v != nullptr, "Could not find external: " + string(func_addr_str));
             //cout << "External fail" << sym_name << " has type: " << final_val->getType() << "\n";
         }
 
@@ -1400,8 +1400,16 @@ bool natModToModule(NativeModulePtr natMod, Module *M, raw_ostream &report) {
     GlobalValue *gv = dyn_cast<GlobalValue>(
         M->getOrInsertGlobal(symname, extType));
     TASSERT(gv != NULL, "Could not make global value!");
-    gv->setLinkage(
-        /*GlobalValue::AvailableExternallyLinkage*/GlobalValue::ExternalLinkage);
+    if(dr->isWeak())
+    {
+      gv->setLinkage(
+          /*GlobalValue::AvailableExternallyLinkage*/GlobalValue::ExternalWeakLinkage);
+    }
+    else
+    {
+      gv->setLinkage(
+          /*GlobalValue::AvailableExternallyLinkage*/GlobalValue::ExternalLinkage);
+    }
 
     const std::string &triple = M->getTargetTriple();
 
@@ -1471,7 +1479,14 @@ bool natModToModule(NativeModulePtr natMod, Module *M, raw_ostream &report) {
               "Encountered an unknown return type while translating function");
       }
       FunctionType *ft = FunctionType::get(returnType, arguments, false);
-      f = Function::Create(ft, GlobalValue::ExternalLinkage, symName, M);
+      if(e->isWeak())
+      {
+        f = Function::Create(ft, GlobalValue::ExternalWeakLinkage, symName, M);
+      }
+      else
+      {
+        f = Function::Create(ft, GlobalValue::ExternalLinkage, symName, M);
+      }
 
       if (e->getReturnType() == ExternalCodeRef::NoReturn) {
         f->setDoesNotReturn();
