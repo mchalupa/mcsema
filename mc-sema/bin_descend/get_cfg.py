@@ -120,6 +120,10 @@ EXTERNAL_DATA_COMMENTS = [
         "Copy of shared data",
         ]
 
+TO_RECOVER = {
+  "stack_vars" : False
+}
+
 def DEBUG(s):
     global _DEBUG, _DEBUG_FILE
     if _DEBUG:
@@ -1644,8 +1648,8 @@ def recoverStackVars(M, F):
 def recoverFunctionFromSet(M, F, blockset, new_eas):
     processed_blocks = set()
 
-    # TODO predicated on cmd flag
-    recoverStackVars(M, F)
+    if TO_RECOVER["stack_vars"]:
+      recoverStackVars(M, F)
 
     while len(blockset) > 0:
         block = blockset.pop()
@@ -1826,7 +1830,7 @@ def preprocessBinary():
                             idaapi.del_cref(head, op.value, False)
 
 
-def recoverCfg(to_recover, outf, exports_are_apis=False, stack_vars=False):
+def recoverCfg(to_recover, outf, exports_are_apis=False):
     M = CFG_pb2.Module()
     M.module_name = idc.GetInputFile()
     DEBUG("PROCESSING: {0}\n".format(M.module_name))
@@ -2184,6 +2188,9 @@ if __name__ == "__main__":
         DEBUG("Using PIE mode.")
         PIE_MODE = True
 
+    if args.stack_vars:
+      TO_RECOVER["stack_vars"] = True
+
     # for batch mode: ensure IDA is done processing
     if args.batch:
         DEBUG("Using Batch mode.")
@@ -2274,9 +2281,6 @@ if __name__ == "__main__":
         
         if args.stack_vars:
             DEBUG("Attempting to recover stack variable information...")
-
-        recoverCfg(eps, outf, args.exports_are_apis, args.stack_vars)
-
 
         recoverCfg(eps, outf, args.exports_are_apis, args.stack_vars)
 
