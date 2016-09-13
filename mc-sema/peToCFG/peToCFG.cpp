@@ -373,7 +373,7 @@ InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder, con
     std::list<uint64_t> refs = i->get_refs();
     for(auto r : refs)
     {
-      if(r == addr)
+      if(r == addr && i->get_llvm_var() != nullptr)
       {
         ip->set_mem_var(i);
       }
