@@ -83,6 +83,7 @@ if __name__ == "__main__":
                     lambda x: x == '-help': lambda  y: ['--help'],
                     lambda x: x == '-d': lambda y: ['--debug'],
                     lambda x: x == '--pie-mode': lambda y: ['--pie-mode'],
+                    lambda x: x == '--stack-vars': lambda y: ['--stack-vars'],
                     lambda x: x.startswith("-march=") : set_ida_arch,
                   }
 
@@ -121,7 +122,7 @@ if __name__ == "__main__":
     in_fname, in_ext = splitext(input_file)
     output_file = in_fname + ".cfg"
 
-    new_args.extend(['--output', output_file, '--stack_vars', '-d'])
+    new_args.extend(['--output', output_file, '-d'])
 
     internal_args = [GET_CFG_PY]
     internal_args.extend(new_args)
