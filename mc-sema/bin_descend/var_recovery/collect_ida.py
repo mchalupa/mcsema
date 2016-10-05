@@ -1,9 +1,31 @@
+import idaapi
 import idautils
 import idc
 
 def DEBUG(s):
     #syslog.syslog(str(s))
     sys.stdout.write(str(s))
+
+def _signed_from_unsigned64(val):
+    if val & 0x8000000000000000:
+        return -0x10000000000000000 + val
+    return val
+
+def _signed_from_unsigned32(val):
+    if val & 0x80000000:
+        return -0x100000000 + val
+    return val
+
+if idaapi.get_inf_structure().is_64bit():
+    _signed_from_unsigned = _signed_from_unsigned64
+    _base_ptr = "rbp"
+    _stack_ptr = "rsp"
+elif idaapi.get_inf_structure().is_32bit():
+    _signed_from_unsigned = _signed_from_unsigned32
+    _base_ptr = "ebp"
+    _stack_ptr = "esp"
+_base_ptr_format = "[{}+".format(_base_ptr)
+_stack_ptr_format = "[{}+".format(_stack_ptr)
 
 def _get_flags_from_bits(flag):
     '''
@@ -32,7 +54,7 @@ def _get_flags_from_bits(flag):
       524288:'FF_VAR',
       49152:'FF_ANYNAME',
     }
- 
+
     _0type = {
       'MASK':15728640,
       1048576:'FF_0NUMH',
@@ -77,39 +99,64 @@ def _get_flags_from_bits(flag):
       2952790016:'FF_ALIGN',
     }
 
-    output = ""
-    output = cls[cls['MASK']&flag]
-    
+    flags = set()
+    flags.add(cls[cls['MASK']&flag])
+
     for category in [comm, _0type, _1type, datatype]:
         #the ida docs define, for example, a FF_0VOID = 0 constant in with the rest
         #  of the 0type constants, but I _think_ that just means
         #  the field is unused, rather than being specific data
         val = category.get(category['MASK']&flag, None)
         if val:
-            output = output + " | " + val
-    return output
+            flags.add(val)
+    return flags
+
+def BlockItems(BB):
+    '''
+    Return a list of items in a basic block
+
+    @param BB: basic block object
+
+    @return: ea of each item in block
+    '''
+    fii = idaapi.func_item_iterator_t()
+    ok = fii.set_range(BB.startEA, BB.endEA)
+    while ok:
+        yield fii.current()
+        ok = fii.next_code()
 
 def collect_func_vars(F):
     '''
     Collect stack variable data from a single function F.
-    Returns a list of stack variables 'stackArgs'.
-    The 'stackArgs' value is a list of (offset, variable_name, variable_size, variable_flags) tuples.
+    Returns a dict of stack variables 'stackArgs'.
     Skips stack arguments without names, as well as the special arguments with names " s" and " r".
     variable_flags is a string with flag names.
     '''
+    stackArgs = dict()
+
     f = F.entry_address
+    name = idc.Name(f)
     end = idc.GetFunctionAttr(f, idc.FUNCATTR_END)
     _locals = idc.GetFunctionAttr(f, idc.FUNCATTR_FRSIZE)
     frame = idc.GetFrame(f)
     if frame is None:
-        return []
-    stackArgs = list()
+        return stackArgs
+
+    #grab the offset of the stored frame pointer, so that
+    #we can correlate offsets correctly in referent code
+    # e.g., EBP+(-0x4) will match up to the -0x4 offset
+    delta = idc.GetMemberOffset(frame, " s")
+    if -1 == delta:
+        #indicates that it wasn't found. Unsure exactly what to do
+        # in that case, punting for now
+        delta = 0
+
     offset = idc.GetFirstMember(frame)
-    while offset != 0xffffffff and offset != 0xffffffffffffffff:
+    while -1 != _signed_from_unsigned(offset):
         memberName = idc.GetMemberName(frame, offset)
-        if memberName is None: 
-            #gaps in stack usage are fine, but generate trash output
-            #gaps also could indicate a buffer that IDA doesn't recognize
+        if memberName is None:
+            # gaps in stack usage are fine, but generate trash output
+            # gaps also could indicate a buffer that IDA doesn't recognize
             offset = idc.GetStrucNextOff(frame, offset)
             continue
         if (memberName == " r" or memberName == " s"):
@@ -120,10 +167,18 @@ def collect_func_vars(F):
         memberFlag = idc.GetMemberFlag(frame, offset)
         #TODO: handle the case where a struct is encountered (FF_STRU flag)
         flag_str = _get_flags_from_bits(memberFlag)
-        stackArgs.append((offset, memberName, memberSize, flag_str))
+        stackArgs[offset-delta] = {"name":memberName,
+                                   "size":memberSize,
+                                   "flags":flag_str,
+                                   "writes":set(),
+                                   "referent":set(),
+                                   "reads":set()}
         offset = idc.GetStrucNextOff(frame, offset)
     #functions.append({"name":name, "stackArgs":stackArgs})
-    return stackArgs 
+    if len(stackArgs) > 0:
+      _find_local_references(f, {"name":name, "stackArgs":stackArgs})
+
+    return stackArgs
 
 def collect_func_vars_all():
     '''
@@ -134,26 +189,136 @@ def collect_func_vars_all():
     Skips functions without frames.
     variable_flags is a string with flag names.
     '''
+    class functionWrapper(object):
+        def __init__(self, addr):
+            self.entry_address = addr
+
     functions = list()
     funcs = idautils.Functions()
     for f in funcs:
         #name = idc.Name(f)
         f_ea = idc.GetFunctionAttr(f, idc.FUNCATTR_START)
-        f_vars = collect_func_vars(f)
-        functions.append({"ea":f_ea, "stackArgs":f_vars})
+        f_vars = collect_func_vars(functionWrapper(f))
+        functions.append({"ea":f_ea, "stackArgs":f_vars, "name":idc.Name(f)})
     return functions
 
-if __name__ == "__main__":
-    print_func_vars()
+def _process_mov_inst(addr, referers, dereferences, func_var_data):
+    '''
+    - type data regarding the target operand is discarded
+    - if the source operand contains an address of a stack variable:
+        if the target is a reg, just update the target as tainted with the address
+        if the target is a stack var, flag it as a local reference
+    - if the target operand is a stack var, add the EA of the inst to that var's operators
+    '''
+
+    #remove the target operand from the taint collections
+    referers.pop(idc.GetOpnd(addr, 0), None)
+    dereferences.pop(idc.GetOpnd(addr, 0), None)
+
+    target_op = idc.GetOpnd(addr, 0)
+    read_op = idc.GetOpnd(addr, 1)
+
+    if idc.GetOpnd(addr, 1) in referers:
+        # handling the two following mov cases in this block:
+        #   lea eax, [ebp-8]  #collecting the address of a stack variable
+        #   mov ebx, eax  # copying referent data around
+        #   mov [ebp-4], ebx   # copying referent data into a stack variable (i.e., moving an address into a pointer)
+
+        if _base_ptr_format in target_op:
+            #moving referent data into a stack variable (i.e., moving an address into a pointer)
+            offset = _signed_from_unsigned(idc.GetOperandValue(addr, 0))
+            if offset in func_var_data["stackArgs"].keys():
+                func_var_data["stackArgs"][offset]["flags"].add("LOCAL_REFERER")
+                # collect which stack variable offset this variable points to
+                func_var_data["stackArgs"][offset]["referent"].add(referers[idc.GetOpnd(addr, 1)])
+        else:
+            #moving referent data around
+            referers[target_op] = referers[idc.GetOpnd(addr, 1)]
+    elif _base_ptr_format in idc.GetOpnd(addr, 1) or _stack_ptr_format in idc.GetOpnd(addr, 1):
+        # mov eax, [ebp-4]  //eax now tainted with stack var data
+        offset = _signed_from_unsigned(idc.GetOperandValue(addr, 1))
+        if offset in func_var_data["stackArgs"].keys():
+            dereferences[idc.GetOpnd(addr, 0)] = offset
+
+    ''' collect EAs of instructions that write to stack variables'''
+    if _base_ptr_format in target_op or _stack_ptr_format in target_op:
+        # mov [ebp-4], eax
+        offset = _signed_from_unsigned(idc.GetOperandValue(addr, 0))
+        if offset in func_var_data["stackArgs"].keys():
+            func_var_data["stackArgs"][offset]["writes"].add(addr)
+
+    ''' collect EAs of instructions that read from stack variables'''
+    if _base_ptr_format in read_op or _stack_ptr_format in read_op:
+        # mov eax, [ebp-4]
+        offset = _signed_from_unsigned(idc.GetOperandValue(addr, 1))
+        if offset in func_var_data["stackArgs"].keys():
+            func_var_data["stackArgs"][offset]["reads"].add(addr)
+
+def _process_lea_inst(addr, referers, dereferences, func_var_data):
+    if _base_ptr_format in idc.GetOpnd(addr, 1) or _stack_ptr_format in idc.GetOpnd(addr, 1):
+        #referers[operand] = offset
+        referers[idc.GetOpnd(addr, 0)] = _signed_from_unsigned(idc.GetOperandValue(addr, 1))
+
+def _process_call_inst(addr, referers, dereferences, func_var_data):
+    target_op = idc.GetOpnd(addr, 0)
+    if target_op in referers:
+        #maybe do something here? explicitly calling to the stack. Hrm.
+        pass
+    if target_op in dereferences:
+        # mov eax, [ebp+4]
+        # call eax
+        func_var_data["stackArgs"][dereferences[target_op]]["flags"].add("CODE_PTR")
+    # clear the referers and dereferences?
+
+def _process_basic_block(BB, func_var_data, referers, dereferences, visited_bb):
+    if BB.startEA in visited_bb:
+        return
+    visited_bb.add(BB.startEA)
+    for addr in BlockItems(BB):
+        _funcs = {"lea":_process_lea_inst,
+                  "mov":_process_mov_inst,
+                  "call":_process_call_inst}
+        func = _funcs.get(idc.GetMnem(addr), None)
+        if func:
+            func(addr, referers, dereferences, func_var_data)
+        else:
+            #check for reads from stack var
+            read_op = idc.GetOpnd(addr, 1)
+            if _base_ptr_format in read_op or _stack_ptr_format in read_op:
+                offset = _signed_from_unsigned(idc.GetOperandValue(addr, 1))
+                if offset in func_var_data["stackArgs"].keys():
+                    func_var_data["stackArgs"][offset]["reads"].add(addr)
+                else:
+                    pass # Hmmm. Unsure what just happened.
+                    #print "offset {} not found at address {}".format(hex(offset), hex(addr))
+
+    for block in BB.succs():
+        _process_basic_block(block, func_var_data, referers.copy(), dereferences.copy(), visited_bb)
+
+def _find_local_references(func, func_var_data):
+    frame = idc.GetFrame(func)
+    if frame is None:
+        return
+    referers = dict() # members of this collection contain the address of an element on the stack. keys are operands, values are stack offset
+    dereferences = dict() # members of this collection contain the data of an element on the stack
+    visited_bb = set()
+    next_bb = list()
+
+    #build the dict of addr->basicblock objects
+    fc = idaapi.FlowChart(idaapi.get_func(func))
+    _process_basic_block(fc[0], func_var_data, referers, dereferences, visited_bb)
 
 def print_func_vars():
     print
     print "Stack Vars:"
-    func_list = collect_func_vars()
+    func_list = collect_func_vars_all()
     for entry in func_list:
         print "{} {{".format(entry['name'])
-        for var in entry['stackArgs']:
-            print "  {}".format(var)
+        for offset in sorted(entry['stackArgs'].keys()):
+            print "  {}: {}".format(hex(offset), entry['stackArgs'][offset])
     print "}"
     print
     print "End Stack Vars"
+
+if __name__ == "__main__":
+    print_func_vars()

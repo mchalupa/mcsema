@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <stddef.h>
 
@@ -9,9 +10,9 @@
 #include "../common/RegisterState.h"
 
 #define MIN_STACK_SIZE 4096
-#define STACK_ALLOC_SIZE (MIN_STACK_SIZE * 10)
+#define STACK_ALLOC_SIZE (MIN_STACK_SIZE * 20)
 #define NUM_DO_CALL_FRAMES 512 /* XXX what is reasonable here? */
-#define STACK_MAX 0x7ffffffff000
+#define DEFAULT_STACK_MAX 0x7ffffffff000ULL
 
 // this is a terrible hack to be compatible with some mcsema definitions. please don't judge
 extern uint64_t mmap(uint64_t addr, uint64_t length, uint32_t prot, uint32_t flags, uint32_t fd, uint32_t offset);
@@ -21,14 +22,54 @@ extern uint64_t mmap(uint64_t addr, uint64_t length, uint32_t prot, uint32_t fla
 __thread RegState __mcsema_callback_state[NUM_DO_CALL_FRAMES];
 // "pointer" to alternate stack
 __thread uint64_t __mcsema_alt_stack[NUM_DO_CALL_FRAMES] = {0};
-__thread uint64_t __mcsema_inception_depth = -1;
+__thread uint64_t __mcsema_inception_depth = 0;
 __thread RegState* __rsptr = NULL;
 __thread uint64_t* __altstackptr = NULL;
+uint64_t __mcsema_stack_max = DEFAULT_STACK_MAX;
+
+uint64_t __mcsema_get_range_max(uint64_t val) {
+    FILE *p = fopen("/proc/self/maps", "r");
+    if(p == NULL) {
+        return 0;
+    }
+
+    char line[1024] = {0};
+    uint64_t start;
+    uint64_t end;
+    while( fgets(line, sizeof(line), p) != NULL ) {
+        if(sscanf(line, "%lx-%lx", &start, &end) == 2) {
+            if(start <= val  && val <= end)  {
+                fclose(p);
+                return end;
+            }
+        } else {
+            break;
+        }
+    }
+
+    fclose(p);
+    return 0;
+}
+
+uint64_t __mcsema_get_max_stack() {
+    uint64_t rsp;
+    __asm__ volatile ("movq %%rsp, %0\n" : "=r"(rsp));
+
+    return __mcsema_get_range_max(rsp);
+}
+
+void __mcsema_init(void) {
+    __mcsema_stack_max = __mcsema_get_max_stack();
+    if (__mcsema_stack_max == 0) {
+        __mcsema_stack_max = DEFAULT_STACK_MAX;
+    }
+}
 
 void* __mcsema_create_alt_stack(size_t stack_size)
 {
     // we need some place to set this, and this function
     // will get called before these are used
+    __mcsema_alt_stack[0] = __mcsema_stack_max;
     __rsptr = &__mcsema_callback_state[0];
     __altstackptr = &__mcsema_alt_stack[0];
     
@@ -71,7 +112,11 @@ __attribute__((naked)) int __mcsema_inception()
     // if not, allocate it
     __asm__ volatile (
             // offset of altstack from fs:0
-            "leaq %[altstack], %%rax\n"
+            "leaq %[altstack], %%rbp\n"
+            // get extent of RSP
+            "callq %P[get_stack_max]\n"
+            "movq %%rax, %%r14\n"
+            "movq %%rbp, %%rax\n"
             // offset of fs:0
             "movq %%fs:0, %%rbx\n"
             // base + offset = location of test
@@ -92,6 +137,7 @@ __attribute__((naked)) int __mcsema_inception()
             "0:\n"
             : [altstack]"=m"(__mcsema_alt_stack[__mcsema_inception_depth])
             : [createalt]"i"(__mcsema_create_alt_stack), 
+              [get_stack_max]"i"(__mcsema_get_max_stack), 
               [stack_alloc_size]"i"(STACK_ALLOC_SIZE));
     
     __asm__ volatile(
@@ -104,38 +150,23 @@ __attribute__((naked)) int __mcsema_inception()
             // new write point == array base + index
             "addq %%rax, %%rsi\n"
 
-            "popq %%rax\n" // restore rax from saved stack
-            "movq %%rax, %c[state_rax](%%rsi)\n" // convert native state to struct regs
+            "popq %c[state_rax](%%rsi)\n" // restore rax from saved stack
             "movq %%rsi, %%rax\n" // we wrote rax to reg state, now use it as scratch
             // save all other registers to register context
-            "popq %%rbx\n"
-            "movq %%rbx, %c[state_rbx](%%rax)\n" // convert native state to struct regs
-            "popq %%rcx\n"
-            "movq %%rcx, %c[state_rcx](%%rax)\n" // convert native state to struct regs
-            "popq %%rdx\n"
-            "movq %%rdx, %c[state_rdx](%%rax)\n" // convert native state to struct regs
-            "popq %%rsi\n"
-            "movq %%rsi, %c[state_rsi](%%rax)\n" // convert native state to struct regs
-            "popq %%rdi\n"
-            "movq %%rdi, %c[state_rdi](%%rax)\n" // convert native state to struct regs
-            "popq %%rbp\n"
-            "movq %%rbp, %c[state_rbp](%%rax)\n" // convert native state to struct regs
-            "popq %%r8\n"
-            "movq %%r8,  %c[state_r8](%%rax)\n" // convert native state to struct regs
-            "popq %%r9\n"
-            "movq %%r9,  %c[state_r9](%%rax)\n" // convert native state to struct regs
-            "popq %%r10\n"
-            "movq %%r10, %c[state_r10](%%rax)\n" // convert native state to struct regs
-            "popq %%r11\n"
-            "movq %%r11, %c[state_r11](%%rax)\n" // convert native state to struct regs
-            "popq %%r12\n"
-            "movq %%r12, %c[state_r12](%%rax)\n" // convert native state to struct regs
-            "popq %%r13\n"
-            "movq %%r13, %c[state_r13](%%rax)\n" // convert native state to struct regs
-            "popq %%r14\n"
-            "movq %%r14, %c[state_r14](%%rax)\n" // convert native state to struct regs
-            "popq %%r15\n"
-            "movq %%r15, %c[state_r15](%%rax)\n" // convert native state to struct regs
+            "popq %c[state_rbx](%%rax)\n"
+            "popq %c[state_rcx](%%rax)\n"
+            "popq %c[state_rdx](%%rax)\n"
+            "popq %c[state_rsi](%%rax)\n"
+            "popq %c[state_rdi](%%rax)\n"
+            "popq %c[state_rbp](%%rax)\n"
+            "popq %c[state_r8](%%rax)\n"
+            "popq %c[state_r9](%%rax)\n"
+            "popq %c[state_r10](%%rax)\n"
+            "popq %c[state_r11](%%rax)\n"
+            "popq %c[state_r12](%%rax)\n"
+            "popq %c[state_r13](%%rax)\n"
+            "popq %c[state_r14](%%rax)\n"
+            "popq %c[state_r15](%%rax)\n"
             "movups %%xmm0, %c[state_xmm0](%%rax)\n"
             "movups %%xmm1, %c[state_xmm1](%%rax)\n"
             "movups %%xmm2, %c[state_xmm2](%%rax)\n"
@@ -145,6 +176,26 @@ __attribute__((naked)) int __mcsema_inception()
             "movups %%xmm6, %c[state_xmm6](%%rax)\n"
             "movups %%xmm7, %c[state_xmm7](%%rax)\n"
 
+            // figure out the max stack extent of our parent frame
+            // and figur out where our new stack will be (current frame)
+            // 
+            // max copy extent = __mcsema_alt_stack[depth-1]
+            // current stack alloc = __mcsema_alt_stack[depth]
+            //
+            // get altstack base
+            "movq %[alt_stack_base], %%rdi\n"
+            // get altstack offset
+            "movq %1, %%rbx\n"
+            "imulq $8, %%rbx\n"
+            // add base + offset
+            "addq %%rbx, %%rdi\n"
+            // read value at __mcseema_alt_stack[depth-1]
+            // this is the old stack extent
+            //"movq -8(%%rdi), %%r14\n"
+            // read value at __mcseema_alt_stack[depth]
+            // this is the new stack extent
+            "movq (%%rdi), %%r15\n"
+
             // copy over STACK_SIZE/2 bytes of stack (we may need to fetch stuff from it)
             // at this point we saved all the registers, so we can clobber at will
             // since they are restored on function exit
@@ -153,21 +204,11 @@ __attribute__((naked)) int __mcsema_inception()
             "movq $%c[half_stack_size], %%rcx\n" // attempted copy size
             "movq %%rsp, %%rsi\n" // base of copy
             "leaq (%%rsi, %%rcx, 1), %%rdi\n" // extent
-            "movabs $%c[stack_max], %%r14\n" // max allowed
+            //"movabs $%c[stack_max], %%r14\n" // max allowed
             "movq %%r14, %%r13\n"
             "subq %%rsi, %%r13\n" // copy size if extent is > max
             "cmpq %%r14, %%rdi\n" // compare extent and max
-            "cmovaq %%r13, %%rcx\n" // if extent > max, copy only to max
-            
-            // get altstack base
-            "movq %[alt_stack_base], %%rdi\n"
-            // get altstack offset
-            "movq %1, %%rbx\n"
-            "imulq $8, %%rbx\n"
-            // add base + offset
-            "addq %%rbx, %%rdi\n"
-            // read value in alt stack array
-            "movq (%%rdi), %%rdi\n"
+            "cmovaq %%r13, %%rcx\n" // if extent > max, copy only to max 
     
             // fetch call destination from stack
             "popq %%r8\n" // put translated destination into r8
@@ -177,6 +218,8 @@ __attribute__((naked)) int __mcsema_inception()
             // align stack
             "movq %%rsp, %%r10\n"
             "andq $0xF, %%r10\n"
+            // rdi = current alt stack extent
+            "movq %%r15, %%rdi\n"
             "subq $0x10, %%rdi\n"
             "addq %%r10, %%rdi\n"
             "subq $%c[half_stack_size], %%rdi\n"
@@ -263,7 +306,7 @@ __attribute__((naked)) int __mcsema_inception()
               [struct_size]"e"(sizeof(RegState)),
               [stack_alloc_size]"i"(STACK_ALLOC_SIZE),
               [half_stack_size]"i"(STACK_ALLOC_SIZE/2),
-              [stack_max]"i"(STACK_MAX),
+              //[stack_max]"i"(STACK_MAX),
               [alt_stack_base]"m"(__altstackptr)
               );
 
@@ -467,10 +510,8 @@ void do_call_value(void *state, uint64_t value)
             "movups %%xmm7, %c[state_xmm7](%%rsi)\n"
             "movq %%rax, %%rbx\n" // already saved rbx, so lets use it as temp reg
             "movq %%rsi, %%rcx\n" // already saved rcx, so lets use it as temp reg
-            "popq %%rsi\n" // get rsi from function return
-            "popq %%rax\n" // get rax from function return
-            "movq %%rax, %c[state_rax](%%rcx)\n" // convert native state to struct regs
-            "movq %%rsi, %c[state_rsi](%%rcx)\n" // convert native state to struct regs
+            "popq %c[state_rsi](%%rcx)\n" // get rsi from function return
+            "popq %c[state_rax](%%rcx)\n" // get rax from function return
             "movq %%rsp, %c[state_rsp](%%rcx)\n" // convert native state to struct regs
             "leaq %c[real_rsp_off](%%rbx), %%rsi\n" // location of old native rsp
             "movq (%%rsi), %%rsp\n" // return original stack

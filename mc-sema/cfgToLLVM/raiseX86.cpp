@@ -572,11 +572,11 @@ void allocateStackLocals(Function *F, NativeFunctionPtr func) {
   Instruction *cur = begin->getFirstNonPHI();
   std::list<NativeStackVarPtr> stackvars = func->get_stackvars();
   Type *t;
-  for(std::list<NativeStackVarPtr>::iterator sv = stackvars.begin(); sv != stackvars.end(); ++sv)
+  for(auto s : stackvars)
   {
     // form type
-    // TODO just ints for now...
-    switch((*sv)->get_size())
+    // TODO just ints for now; take into account type 
+    switch(s->get_size())
     {
       t = NULL; // debugging; probably should choose a better failure value
       case 1:
@@ -588,14 +588,21 @@ void allocateStackLocals(Function *F, NativeFunctionPtr func) {
       case 4:
         t = Type::getInt32Ty(F->getContext());
         break;
+      case 8:
+        t = Type::getInt64Ty(F->getContext());
+        break;
       default:
         // ignore this one
         continue;
     }
     // alloca
-    cout << "Inserting var " << (*sv)->get_name() << ", size " << (*sv)->get_size() << std::endl;
-    Instruction *v = new AllocaInst(t, (*sv)->get_name(), cur);
-    cur = v;
+    if(t != NULL)
+    {
+      cout << "Inserting var " << s->get_name() << ", size " << s->get_size() << " (ida_type " << s->get_type() <<")" << std::endl;
+      Instruction *v = new AllocaInst(t, s->get_name(), cur);
+      s->set_llvm_var(v);
+      cur = v;
+    }
   }
   return;
 }
@@ -1183,7 +1190,7 @@ void dataSectionToTypesContents(const list<DataSection> &globaldata,
 
         Constant *final_val  = nullptr;
 
-        GlobalVariable *ext_v = M->getNamedGlobal(func_addr_str);
+        GlobalValue *ext_v = M->getNamedValue(func_addr_str);
 
         if(ext_v != nullptr && isa<Function>(ext_v)) {
             final_val = getPtrSizedValue(M, ext_v, dsec_itr->getSize());
@@ -1193,7 +1200,7 @@ void dataSectionToTypesContents(const list<DataSection> &globaldata,
             //cout << "External data" << sym_name << " has type: " << final_val->getType() << "\n";
             // assume ext data
         } else {
-            TASSERT(ext_v != nullptr, "Could not find external: " + sym_name);
+            TASSERT(ext_v != nullptr, "Could not find external: " + string(func_addr_str));
             //cout << "External fail" << sym_name << " has type: " << final_val->getType() << "\n";
         }
 
@@ -1393,8 +1400,16 @@ bool natModToModule(NativeModulePtr natMod, Module *M, raw_ostream &report) {
     GlobalValue *gv = dyn_cast<GlobalValue>(
         M->getOrInsertGlobal(symname, extType));
     TASSERT(gv != NULL, "Could not make global value!");
-    gv->setLinkage(
-        /*GlobalValue::AvailableExternallyLinkage*/GlobalValue::ExternalLinkage);
+    if(dr->isWeak())
+    {
+      gv->setLinkage(
+          /*GlobalValue::AvailableExternallyLinkage*/GlobalValue::ExternalWeakLinkage);
+    }
+    else
+    {
+      gv->setLinkage(
+          /*GlobalValue::AvailableExternallyLinkage*/GlobalValue::ExternalLinkage);
+    }
 
     const std::string &triple = M->getTargetTriple();
 
@@ -1464,7 +1479,14 @@ bool natModToModule(NativeModulePtr natMod, Module *M, raw_ostream &report) {
               "Encountered an unknown return type while translating function");
       }
       FunctionType *ft = FunctionType::get(returnType, arguments, false);
-      f = Function::Create(ft, GlobalValue::ExternalLinkage, symName, M);
+      if(e->isWeak())
+      {
+        f = Function::Create(ft, GlobalValue::ExternalWeakLinkage, symName, M);
+      }
+      else
+      {
+        f = Function::Create(ft, GlobalValue::ExternalLinkage, symName, M);
+      }
 
       if (e->getReturnType() == ExternalCodeRef::NoReturn) {
         f->setDoesNotReturn();

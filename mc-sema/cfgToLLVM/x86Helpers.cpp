@@ -245,6 +245,10 @@ Value *MEM_AS_DATA_REF(BasicBlock *B,
     if(false == ip->has_mem_reference) {
         throw TErr(__LINE__, __FILE__, "Want to use MEM as data ref but have no MEM reference");
     }
+    if(ip->has_mem_var) {
+      return ip->get_mem_var()->get_llvm_var();
+    }
+
     return getAddrFromExpr(B, natM, inst, ip, which);
 }
 

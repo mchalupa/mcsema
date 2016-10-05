@@ -30,7 +30,7 @@ def xrange(begin, end=None, step=1):
     else:
         return iter(itertools.count().next, begin)
 
-_DEBUG = False
+_DEBUG = True
 
 EXTERNALS = set()
 DATA_SEGMENTS = {}
@@ -40,6 +40,8 @@ ACCESSED_VIA_JMP = set()
 
 EMAP = {}
 EMAP_DATA = {}
+
+PIE_MODE = False
 
 SPECIAL_REP_HANDLING = [ 
         [0xC3],
@@ -114,6 +116,10 @@ EXTERNAL_NAMES = [
 EXTERNAL_DATA_COMMENTS = [
         "Copy of shared data",
         ]
+
+TO_RECOVER = {
+  "stack_vars" : False
+}
 
 def DEBUG(s):
     if _DEBUG:
@@ -701,6 +707,7 @@ def instructionHandler(M, B, inst, new_eas):
         had_refs = True
         if dref in crefs:
             continue
+        DEBUG("Adding reference because of data refs from {:x}\n".format(inst))
         addDataReference(M, I, inst, dref, new_eas)
         if isUnconditionalJump(inst):
             xdrefs = idautils.DataRefsFrom(dref)
@@ -713,7 +720,7 @@ def instructionHandler(M, B, inst, new_eas):
                    I.ext_call_name = fn
                    DEBUG("EXTERNAL CALL : {0}\n".format(fn))
 
-    if isLinkedElf():
+    if isLinkedElf() and not PIE_MODE:
         for op in insn_t.Operands:
             if op.type == idc.o_imm:
                 if op.value in drefs_from_here:
@@ -723,6 +730,7 @@ def instructionHandler(M, B, inst, new_eas):
                 end_a = begin_a + idc.ItemSize(begin_a)
                 if isInData(begin_a, end_a):
                     # add data reference
+                    DEBUG("Adding reference because we fixed IMM value\n")
                     addDataReference(M, I, inst, begin_a, new_eas)
                 #elif isInCode(begin_a, end_a):
                 # add code ref
@@ -772,11 +780,15 @@ def parseDefsFile(df):
 def processExternalFunction(M, fn):
 
     args, conv, ret, sign = getFromEMAP(fn)
+    ea = idc.LocByName(fn)
+    is_weak = idaapi.is_weak_name(ea)
 
+    DEBUG("Program will reference external{}: {}\n".format(" (weak)" if is_weak else "", fn))
     extfn = M.external_funcs.add()
     extfn.symbol_name = fn
     extfn.calling_convention = conv
     extfn.argument_count = args
+    extfn.is_weak = is_weak
     if ret == 'N':
         extfn.has_return = True
         extfn.no_return = False
@@ -787,10 +799,15 @@ def processExternalFunction(M, fn):
 def processExternalData(M, dt):
 
     data_size = EMAP_DATA[dt]
+    ea = idc.LocByName(dt)
+    is_weak = idaapi.is_weak_name(ea)
+    
+    DEBUG("Program will reference external{}: {}\n".format(" (weak)" if is_weak else "", dt))
 
     extdt = M.external_data.add()
-    extdt.symbol_name = dt 
+    extdt.symbol_name = dt
     extdt.data_size = data_size
+    extdt.is_weak = is_weak
 
 def processExternals(M):
 
@@ -1079,7 +1096,7 @@ def scanDataForRelocs(M, D, start, end, new_eas, seg_offset):
     while i < end:
         more_dref = [d for d in idautils.DataRefsFrom(i)]
         dref_size = idc.ItemSize(i) or 1
-        if len(more_dref) == 0 and dref_size == 1:
+        if len(more_dref) == 0 and dref_size == 1 and not PIE_MODE:
             dword = readDword(i)
             DEBUG("Testing address: {0:x}... ".format(i))
             # check for unmakred references
@@ -1209,6 +1226,9 @@ def processRelocationsInData(M, D, start, end, new_eas, seg_offset):
                     DEBUG("\t\tNOT ADDING REF: {:08x} -> {:08x}\n".format(i, pointsto))
                 else:
                     insertRelocatedSymbol(M, D, pointsto, i, seg_offset, new_eas, itemsize)
+            else:
+                DEBUG("{:x} is an external reference\n".format(i))
+                insertRelocatedSymbol(M, D, pointsto, i, seg_offset, new_eas, itemsize)
 
             i = idc.GetNextFixupEA(i)
 
@@ -1304,23 +1324,36 @@ def getInstructionSize(ea):
 
 def recoverStackVars(M, F):
     from var_recovery import collect_ida
+    from var_recovery import parse_ida_types
 
     # pull info from IDA
-    stack_locals = collect_ida.collect_func_vars(F) 
-    # jam into M
-    for (var_offset, var_name, var_size, var_flags) in stack_locals:
-        # mash
-        var = F.stackvars.add() 
-        var.sp_offset = var_offset
-        var.var.name = var_name
-        var.var.size = var_size
-        var.var.ida_type = var_flags
+    stack_locals = collect_ida.collect_func_vars(F)
+
+    # TODO: convert flags/type info
+    #stack_locals_typed = map(parse_ida_types.parse_type, stack_locals)
+
+    # add to M
+    for offset in stack_locals.keys():
+      var = F.stackvars.add()
+      var.sp_offset = offset
+      var.var.name = stack_locals[offset]["name"]
+      var.var.size = stack_locals[offset]["size"] 
+      var.var.ida_type = " | ".join(stack_locals[offset]["flags"])
+      # add refs... 
+      for i in stack_locals[offset]["writes"]:
+        r = var.var.ref_eas.add()
+        r.inst_addr = i
+        r.opd_idx = -1
+      for i in stack_locals[offset]["reads"]:
+        r = var.var.ref_eas.add()
+        r.inst_addr = i
+        r.opd_idx = -1
 
 def recoverFunctionFromSet(M, F, blockset, new_eas):
     processed_blocks = set()
 
-    # TODO predicated on cmd flag
-    recoverStackVars(M, F)
+    if TO_RECOVER["stack_vars"]:
+      recoverStackVars(M, F)
 
     while len(blockset) > 0:
         block = blockset.pop()
@@ -1470,9 +1503,22 @@ def preprocessBinary():
                         fulladdr = base+i*esize
                         DEBUG("Address accessed via JMP: {:x}\n".format(fulladdr))
                         ACCESSED_VIA_JMP.add(fulladdr)
+            if PIE_MODE:
+                # convert all immediate operand location references to numbers
+                inslen = idaapi.decode_insn(head)
+                if inslen > 0:
+                    # check every op
+                    for i in range(len(idaapi.cmd.Operands)):
+                        # is this op an immediate?
+                        op = idaapi.cmd.Operands[i]
+                        if op.type == idc.o_imm:
+                            # ensure this is operand is a number, not reference
+                            idaapi.op_num(head, i)
+                            idaapi.del_dref(head, op.value)
+                            idaapi.del_cref(head, op.value, False)
 
 
-def recoverCfg(to_recover, outf, exports_are_apis=False, stack_vars=False):
+def recoverCfg(to_recover, outf, exports_are_apis=False):
     M = CFG_pb2.Module()
     M.module_name = idc.GetInputFile()
     DEBUG("PROCESSING: {0}\n".format(M.module_name))
@@ -1807,15 +1853,23 @@ if __name__ == "__main__":
         help="File containing <name> <address> pairs of symbols to pre-define."
         )
 
-    parser.add_argument("--stack_vars", action="store_true",
+    parser.add_argument("--stack-vars", action="store_true",
         default=False,
         help="Attempt to recover local stack varible information"
         )
+    parser.add_argument("--pie-mode", action="store_true", default=False,
+            help="Assume all immediate values are constants (useful for ELFs built with -fPIE")
 
     args = parser.parse_args(args=idc.ARGV[1:])
 
     if args.debug:
         _DEBUG = True
+
+    if args.pie_mode:
+        PIE_MODE = True
+
+    if args.stack_vars:
+      TO_RECOVER["stack_vars"] = True
 
     # for batch mode: ensure IDA is done processing
     if args.batch:
@@ -1903,10 +1957,7 @@ if __name__ == "__main__":
 
         DEBUG("CFG Output File file: {0}\n".format(outf.name))
 
-        recoverCfg(eps, outf, args.exports_are_apis, args.stack_vars)
-
-        if args.stack_vars:
-            DEBUG("Attempting to recover stack variable information...")
+        recoverCfg(eps, outf, args.exports_are_apis)
 
     except:
         DEBUG(traceback.format_exc())
