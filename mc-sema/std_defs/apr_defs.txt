@@ -359,6 +359,7 @@ apr_os_thread_get 2 C N
 apr_os_threadkey_get 2 C N
 apr_os_threadkey_put 3 C N
 apr_os_thread_put 3 C N
+apr_os_uuid_get 1 C N
 apr_palloc 2 C N
 apr_palloc_debug 3 C N
 apr_parse_addr_port 5 C N
