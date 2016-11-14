@@ -172,7 +172,10 @@ void NativeFunction::add_block(NativeBlockPtr b) {
 
 void NativeFunction::add_stackvar(NativeStackVarPtr s) {
     // TODO: add refs
-    this->stackvars.push_back(s);
+    if(s->get_type().find("FUNC_ARG_REF") == std::string::npos)
+    {
+      this->stackvars.push_back(s);
+    }
     return;
 }
 
