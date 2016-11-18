@@ -59,7 +59,7 @@ message Block {
 
 message Reference {
     required  int64 inst_addr = 1;
-    required  int32 opd_idx = 2;
+    //required  int32 opd_idx = 2;
 }
 
 message Variable {
