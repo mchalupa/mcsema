@@ -197,9 +197,8 @@ void protobuf_AssignDesc_CFG_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(Block));
   Reference_descriptor_ = file->message_type(4);
-  static const int Reference_offsets_[2] = {
+  static const int Reference_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Reference, inst_addr_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Reference, opd_idx_),
   };
   Reference_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -755,103 +754,102 @@ void protobuf_AddDesc_CFG_2eproto() {
     "\026\n\016local_noreturn\030\016 \001(\010\"#\n\007RefType\022\013\n\007Co"
     "deRef\020\000\022\013\n\007DataRef\020\001\"Q\n\005Block\022\033\n\005insts\030\001"
     " \003(\0132\014.Instruction\022\024\n\014base_address\030\002 \002(\003"
-    "\022\025\n\rblock_follows\030\003 \003(\003\"/\n\tReference\022\021\n\t"
-    "inst_addr\030\001 \002(\003\022\017\n\007opd_idx\030\002 \002(\005\"U\n\010Vari"
-    "able\022\014\n\004name\030\001 \002(\t\022\014\n\004size\030\002 \002(\003\022\020\n\010ida_"
-    "type\030\003 \002(\t\022\033\n\007ref_eas\030\004 \003(\0132\n.Reference\""
-    "5\n\010StackVar\022\026\n\003var\030\001 \002(\0132\t.Variable\022\021\n\ts"
-    "p_offset\030\002 \002(\003\"W\n\010Function\022\026\n\006blocks\030\001 \003"
-    "(\0132\006.Block\022\025\n\rentry_address\030\002 \002(\003\022\034\n\tsta"
-    "ckvars\030\003 \003(\0132\t.StackVar\"\224\002\n\020ExternalFunc"
-    "tion\022\023\n\013symbol_name\030\001 \002(\t\022\?\n\022calling_con"
-    "vention\030\002 \002(\0162#.ExternalFunction.Calling"
-    "Convention\022\022\n\nhas_return\030\003 \002(\010\022\021\n\tno_ret"
-    "urn\030\004 \002(\010\022\026\n\016argument_count\030\005 \002(\005\022\017\n\007is_"
-    "weak\030\006 \002(\010\022\021\n\tsignature\030\007 \001(\t\"G\n\021Calling"
-    "Convention\022\021\n\rCallerCleanup\020\000\022\021\n\rCalleeC"
-    "leanup\020\001\022\014\n\010FastCall\020\002\"G\n\014ExternalData\022\023"
-    "\n\013symbol_name\030\001 \002(\t\022\021\n\tdata_size\030\002 \002(\005\022\017"
-    "\n\007is_weak\030\003 \002(\010\"L\n\nDataSymbol\022\024\n\014base_ad"
-    "dress\030\001 \002(\003\022\023\n\013symbol_name\030\002 \002(\t\022\023\n\013symb"
-    "ol_size\030\003 \002(\005\"[\n\004Data\022\024\n\014base_address\030\001 "
-    "\002(\003\022\014\n\004data\030\002 \002(\014\022\034\n\007symbols\030\003 \003(\0132\013.Dat"
-    "aSymbol\022\021\n\tread_only\030\004 \002(\010\"u\n\020EntrySymbo"
-    "lExtra\022\022\n\nentry_argc\030\001 \002(\005\0228\n\013entry_ccon"
-    "v\030\002 \002(\0162#.ExternalFunction.CallingConven"
-    "tion\022\023\n\013does_return\030\003 \002(\010\"`\n\013EntrySymbol"
-    "\022\022\n\nentry_name\030\001 \002(\t\022\025\n\rentry_address\030\002 "
-    "\002(\003\022&\n\013entry_extra\030\003 \001(\0132\021.EntrySymbolEx"
-    "tra\"\316\001\n\006Module\022!\n\016internal_funcs\030\001 \003(\0132\t"
-    ".Function\022)\n\016external_funcs\030\002 \003(\0132\021.Exte"
-    "rnalFunction\022\034\n\rinternal_data\030\003 \003(\0132\005.Da"
-    "ta\022\023\n\013module_name\030\004 \002(\t\022\035\n\007entries\030\005 \003(\013"
-    "2\014.EntrySymbol\022$\n\rexternal_data\030\006 \003(\0132\r."
-    "ExternalData\"l\n\007Edge_64\022\r\n\005value\030\001 \002(\003\022\033"
-    "\n\004kind\030\002 \002(\0162\r.Edge_64.Kind\022\r\n\005label\030\003 \001"
-    "(\010\"&\n\004Kind\022\013\n\007Unknown\020\000\022\007\n\003May\020\001\022\010\n\004Must"
-    "\020\002\"l\n\007Edge_32\022\r\n\005value\030\001 \002(\005\022\033\n\004kind\030\002 \002"
-    "(\0162\r.Edge_32.Kind\022\r\n\005label\030\003 \001(\010\"&\n\004Kind"
-    "\022\013\n\007Unknown\020\000\022\007\n\003May\020\001\022\010\n\004Must\020\002\"\205\004\n\034Ann"
-    "otated_Branch_Instruction\022\?\n\021branch_inst"
-    "r_name\030\001 \002(\0162$.Annotated_Branch_Instruct"
-    "ion.Branch\022\023\n\013is_resolved\030\002 \002(\010\022\023\n\013is_in"
-    "direct\030\003 \002(\010\022\026\n\016is_conditional\030\004 \002(\010\022\017\n\007"
-    "is_leaf\030\005 \002(\010\022\033\n\ttarget_to\030\006 \003(\0132\010.Edge_"
-    "64\022%\n\005instr\030\007 \002(\0132\026.Annotated_Instructio"
-    "n\022\033\n\023abstract_expression\030\010 \001(\t\"\357\001\n\006Branc"
-    "h\022\013\n\007Unknown\020\000\022\007\n\003jmp\020\001\022\010\n\004ljmp\020\002\022\006\n\002jo\020"
-    "\003\022\007\n\003jno\020\004\022\006\n\002jb\020\005\022\007\n\003jae\020\006\022\006\n\002je\020\007\022\007\n\003j"
-    "ne\020\010\022\007\n\003jbe\020\t\022\006\n\002ja\020\n\022\006\n\002js\020\013\022\007\n\003jns\020\014\022\006"
-    "\n\002jp\020\r\022\007\n\003jnp\020\016\022\006\n\002jl\020\017\022\007\n\003jge\020\020\022\007\n\003jle\020"
-    "\021\022\006\n\002jg\020\022\022\n\n\006loopne\020\023\022\t\n\005loope\020\024\022\010\n\004loop"
-    "\020\025\022\t\n\005jCcxz\020\026\022\007\n\003ret\020\027\022\010\n\004call\020\030\"\270\003\n\025Ann"
-    "otated_Instruction\022\022\n\ninstr_name\030\001 \002(\t\022\024"
-    "\n\014instr_string\030\002 \002(\t\022\021\n\tinst_addr\030\003 \002(\003\022"
-    "\020\n\010inst_len\030\004 \002(\005\022\020\n\010op_count\030\005 \002(\005\022\025\n\ri"
-    "nst_addr_hex\030\006 \001(\t\022\035\n\025is_branch_instruct"
-    "ion\030\007 \002(\010\0220\n\010argument\030\010 \003(\0132\036.Annotated_"
-    "Instruction.Operand\022 \n\016referered_from\030\t "
-    "\003(\0132\010.Edge_64\032\263\001\n\007Operand\022\013\n\003pos\030\001 \002(\005\0229"
-    "\n\004type\030\002 \002(\0162+.Annotated_Instruction.Ope"
-    "rand.Operand_Type\022\r\n\005value\030\003 \001(\t\"Q\n\014Oper"
-    "and_Type\022\013\n\007Unknown\020\000\022\r\n\tImmediate\020\001\022\014\n\010"
-    "Register\020\002\022\n\n\006Memory\020\003\022\013\n\007Address\020\004\"\251\003\n\025"
-    "Annotated_Register_32\022-\n\004name\030\001 \002(\0162\037.An"
-    "notated_Register_32.Register\022\024\n\014used_at_"
-    "addr\030\002 \002(\003\022\030\n\020used_at_addr_hex\030\003 \001(\t\022\027\n\005"
-    "value\030\007 \003(\0132\010.Edge_32\022-\n\004fact\030\010 \002(\0132\037.An"
-    "notated_Register_32.Property\022\033\n\023abstract"
-    "_expression\030\t \001(\t\032*\n\010Property\022\017\n\007Unknown"
-    "\030\001 \002(\010\022\r\n\005Alive\030\002 \001(\010\"\237\001\n\010Register\022\013\n\007Un"
-    "known\020\000\022\007\n\003eax\020\001\022\007\n\003ecx\020\002\022\007\n\003edx\020\003\022\007\n\003eb"
-    "x\020\004\022\007\n\003esp\020\005\022\007\n\003ebp\020\006\022\007\n\003esi\020\007\022\007\n\003edi\020\010\022"
-    "\007\n\003eip\020\t\022\013\n\007fs_base\020\n\022\013\n\007gs_base\020\013\022\007\n\003gt"
-    "d\020\014\022\007\n\003ldt\020\r\022\t\n\005mxcsr\020\016\"\344\003\n\025Annotated_Re"
-    "gister_64\022-\n\004name\030\001 \002(\0162\037.Annotated_Regi"
-    "ster_64.Register\022\024\n\014used_at_addr\030\002 \002(\003\022\030"
-    "\n\020used_at_addr_hex\030\003 \001(\t\022\027\n\005value\030\004 \003(\0132"
-    "\010.Edge_64\022-\n\004fact\030\005 \002(\0132\037.Annotated_Regi"
-    "ster_64.Property\022\033\n\023abstract_expression\030"
-    "\006 \001(\t\032*\n\010Property\022\017\n\007Unknown\030\001 \002(\010\022\r\n\005Al"
-    "ive\030\002 \001(\010\"\332\001\n\010Register\022\013\n\007Unknown\020\000\022\007\n\003r"
-    "ax\020\n\022\007\n\003rcx\020\013\022\007\n\003rdx\020\014\022\007\n\003rbx\020\r\022\007\n\003rsp\020\016"
-    "\022\007\n\003rbp\020\017\022\007\n\003rsi\020\020\022\007\n\003rdi\020\021\022\007\n\003rip\020\022\022\006\n\002"
-    "r8\020\023\022\006\n\002r9\020\024\022\007\n\003r10\020\025\022\007\n\003r11\020\026\022\007\n\003r12\020\027\022"
-    "\007\n\003r13\020\030\022\007\n\003r14\020\031\022\007\n\003r15\020\032\022\013\n\007fs_base\020\033\022"
-    "\013\n\007gs_base\020\034\022\007\n\003gdt\020\035\022\007\n\003ldt\020\036\"\215\002\n\022Annot"
-    "ated_Function\022\014\n\004name\030\001 \002(\t\022\025\n\rstart_at_"
-    "addr\030\002 \002(\003\022\031\n\021start_at_addr_hex\030\003 \001(\t\022\023\n"
-    "\013end_at_addr\030\004 \001(\003\022\027\n\017end_at_addr_hex\030\005 "
-    "\001(\t\022&\n\006prolog\030\006 \003(\0132\026.Annotated_Instruct"
-    "ion\022&\n\006epilog\030\007 \003(\0132\026.Annotated_Instruct"
-    "ion\022 \n\016referered_from\030\010 \003(\0132\010.Edge_64\022\027\n"
-    "\005calls\030\t \003(\0132\010.Edge_64\"\334\001\n\013Disassembly\022%"
-    "\n\005instr\030\001 \003(\0132\026.Annotated_Instruction\0223\n"
-    "\014branch_instr\030\002 \003(\0132\035.Annotated_Branch_I"
-    "nstruction\022&\n\006reg_32\030\003 \003(\0132\026.Annotated_R"
-    "egister_32\022&\n\006reg_64\030\004 \003(\0132\026.Annotated_R"
-    "egister_64\022!\n\004func\030\005 \003(\0132\023.Annotated_Fun"
-    "ction", 4565);
+    "\022\025\n\rblock_follows\030\003 \003(\003\"\036\n\tReference\022\021\n\t"
+    "inst_addr\030\001 \002(\003\"U\n\010Variable\022\014\n\004name\030\001 \002("
+    "\t\022\014\n\004size\030\002 \002(\003\022\020\n\010ida_type\030\003 \002(\t\022\033\n\007ref"
+    "_eas\030\004 \003(\0132\n.Reference\"5\n\010StackVar\022\026\n\003va"
+    "r\030\001 \002(\0132\t.Variable\022\021\n\tsp_offset\030\002 \002(\003\"W\n"
+    "\010Function\022\026\n\006blocks\030\001 \003(\0132\006.Block\022\025\n\rent"
+    "ry_address\030\002 \002(\003\022\034\n\tstackvars\030\003 \003(\0132\t.St"
+    "ackVar\"\224\002\n\020ExternalFunction\022\023\n\013symbol_na"
+    "me\030\001 \002(\t\022\?\n\022calling_convention\030\002 \002(\0162#.E"
+    "xternalFunction.CallingConvention\022\022\n\nhas"
+    "_return\030\003 \002(\010\022\021\n\tno_return\030\004 \002(\010\022\026\n\016argu"
+    "ment_count\030\005 \002(\005\022\017\n\007is_weak\030\006 \002(\010\022\021\n\tsig"
+    "nature\030\007 \001(\t\"G\n\021CallingConvention\022\021\n\rCal"
+    "lerCleanup\020\000\022\021\n\rCalleeCleanup\020\001\022\014\n\010FastC"
+    "all\020\002\"G\n\014ExternalData\022\023\n\013symbol_name\030\001 \002"
+    "(\t\022\021\n\tdata_size\030\002 \002(\005\022\017\n\007is_weak\030\003 \002(\010\"L"
+    "\n\nDataSymbol\022\024\n\014base_address\030\001 \002(\003\022\023\n\013sy"
+    "mbol_name\030\002 \002(\t\022\023\n\013symbol_size\030\003 \002(\005\"[\n\004"
+    "Data\022\024\n\014base_address\030\001 \002(\003\022\014\n\004data\030\002 \002(\014"
+    "\022\034\n\007symbols\030\003 \003(\0132\013.DataSymbol\022\021\n\tread_o"
+    "nly\030\004 \002(\010\"u\n\020EntrySymbolExtra\022\022\n\nentry_a"
+    "rgc\030\001 \002(\005\0228\n\013entry_cconv\030\002 \002(\0162#.Externa"
+    "lFunction.CallingConvention\022\023\n\013does_retu"
+    "rn\030\003 \002(\010\"`\n\013EntrySymbol\022\022\n\nentry_name\030\001 "
+    "\002(\t\022\025\n\rentry_address\030\002 \002(\003\022&\n\013entry_extr"
+    "a\030\003 \001(\0132\021.EntrySymbolExtra\"\316\001\n\006Module\022!\n"
+    "\016internal_funcs\030\001 \003(\0132\t.Function\022)\n\016exte"
+    "rnal_funcs\030\002 \003(\0132\021.ExternalFunction\022\034\n\ri"
+    "nternal_data\030\003 \003(\0132\005.Data\022\023\n\013module_name"
+    "\030\004 \002(\t\022\035\n\007entries\030\005 \003(\0132\014.EntrySymbol\022$\n"
+    "\rexternal_data\030\006 \003(\0132\r.ExternalData\"l\n\007E"
+    "dge_64\022\r\n\005value\030\001 \002(\003\022\033\n\004kind\030\002 \002(\0162\r.Ed"
+    "ge_64.Kind\022\r\n\005label\030\003 \001(\010\"&\n\004Kind\022\013\n\007Unk"
+    "nown\020\000\022\007\n\003May\020\001\022\010\n\004Must\020\002\"l\n\007Edge_32\022\r\n\005"
+    "value\030\001 \002(\005\022\033\n\004kind\030\002 \002(\0162\r.Edge_32.Kind"
+    "\022\r\n\005label\030\003 \001(\010\"&\n\004Kind\022\013\n\007Unknown\020\000\022\007\n\003"
+    "May\020\001\022\010\n\004Must\020\002\"\205\004\n\034Annotated_Branch_Ins"
+    "truction\022\?\n\021branch_instr_name\030\001 \002(\0162$.An"
+    "notated_Branch_Instruction.Branch\022\023\n\013is_"
+    "resolved\030\002 \002(\010\022\023\n\013is_indirect\030\003 \002(\010\022\026\n\016i"
+    "s_conditional\030\004 \002(\010\022\017\n\007is_leaf\030\005 \002(\010\022\033\n\t"
+    "target_to\030\006 \003(\0132\010.Edge_64\022%\n\005instr\030\007 \002(\013"
+    "2\026.Annotated_Instruction\022\033\n\023abstract_exp"
+    "ression\030\010 \001(\t\"\357\001\n\006Branch\022\013\n\007Unknown\020\000\022\007\n"
+    "\003jmp\020\001\022\010\n\004ljmp\020\002\022\006\n\002jo\020\003\022\007\n\003jno\020\004\022\006\n\002jb\020"
+    "\005\022\007\n\003jae\020\006\022\006\n\002je\020\007\022\007\n\003jne\020\010\022\007\n\003jbe\020\t\022\006\n\002"
+    "ja\020\n\022\006\n\002js\020\013\022\007\n\003jns\020\014\022\006\n\002jp\020\r\022\007\n\003jnp\020\016\022\006"
+    "\n\002jl\020\017\022\007\n\003jge\020\020\022\007\n\003jle\020\021\022\006\n\002jg\020\022\022\n\n\006loop"
+    "ne\020\023\022\t\n\005loope\020\024\022\010\n\004loop\020\025\022\t\n\005jCcxz\020\026\022\007\n\003"
+    "ret\020\027\022\010\n\004call\020\030\"\270\003\n\025Annotated_Instructio"
+    "n\022\022\n\ninstr_name\030\001 \002(\t\022\024\n\014instr_string\030\002 "
+    "\002(\t\022\021\n\tinst_addr\030\003 \002(\003\022\020\n\010inst_len\030\004 \002(\005"
+    "\022\020\n\010op_count\030\005 \002(\005\022\025\n\rinst_addr_hex\030\006 \001("
+    "\t\022\035\n\025is_branch_instruction\030\007 \002(\010\0220\n\010argu"
+    "ment\030\010 \003(\0132\036.Annotated_Instruction.Opera"
+    "nd\022 \n\016referered_from\030\t \003(\0132\010.Edge_64\032\263\001\n"
+    "\007Operand\022\013\n\003pos\030\001 \002(\005\0229\n\004type\030\002 \002(\0162+.An"
+    "notated_Instruction.Operand.Operand_Type"
+    "\022\r\n\005value\030\003 \001(\t\"Q\n\014Operand_Type\022\013\n\007Unkno"
+    "wn\020\000\022\r\n\tImmediate\020\001\022\014\n\010Register\020\002\022\n\n\006Mem"
+    "ory\020\003\022\013\n\007Address\020\004\"\251\003\n\025Annotated_Registe"
+    "r_32\022-\n\004name\030\001 \002(\0162\037.Annotated_Register_"
+    "32.Register\022\024\n\014used_at_addr\030\002 \002(\003\022\030\n\020use"
+    "d_at_addr_hex\030\003 \001(\t\022\027\n\005value\030\007 \003(\0132\010.Edg"
+    "e_32\022-\n\004fact\030\010 \002(\0132\037.Annotated_Register_"
+    "32.Property\022\033\n\023abstract_expression\030\t \001(\t"
+    "\032*\n\010Property\022\017\n\007Unknown\030\001 \002(\010\022\r\n\005Alive\030\002"
+    " \001(\010\"\237\001\n\010Register\022\013\n\007Unknown\020\000\022\007\n\003eax\020\001\022"
+    "\007\n\003ecx\020\002\022\007\n\003edx\020\003\022\007\n\003ebx\020\004\022\007\n\003esp\020\005\022\007\n\003e"
+    "bp\020\006\022\007\n\003esi\020\007\022\007\n\003edi\020\010\022\007\n\003eip\020\t\022\013\n\007fs_ba"
+    "se\020\n\022\013\n\007gs_base\020\013\022\007\n\003gtd\020\014\022\007\n\003ldt\020\r\022\t\n\005m"
+    "xcsr\020\016\"\344\003\n\025Annotated_Register_64\022-\n\004name"
+    "\030\001 \002(\0162\037.Annotated_Register_64.Register\022"
+    "\024\n\014used_at_addr\030\002 \002(\003\022\030\n\020used_at_addr_he"
+    "x\030\003 \001(\t\022\027\n\005value\030\004 \003(\0132\010.Edge_64\022-\n\004fact"
+    "\030\005 \002(\0132\037.Annotated_Register_64.Property\022"
+    "\033\n\023abstract_expression\030\006 \001(\t\032*\n\010Property"
+    "\022\017\n\007Unknown\030\001 \002(\010\022\r\n\005Alive\030\002 \001(\010\"\332\001\n\010Reg"
+    "ister\022\013\n\007Unknown\020\000\022\007\n\003rax\020\n\022\007\n\003rcx\020\013\022\007\n\003"
+    "rdx\020\014\022\007\n\003rbx\020\r\022\007\n\003rsp\020\016\022\007\n\003rbp\020\017\022\007\n\003rsi\020"
+    "\020\022\007\n\003rdi\020\021\022\007\n\003rip\020\022\022\006\n\002r8\020\023\022\006\n\002r9\020\024\022\007\n\003r"
+    "10\020\025\022\007\n\003r11\020\026\022\007\n\003r12\020\027\022\007\n\003r13\020\030\022\007\n\003r14\020\031"
+    "\022\007\n\003r15\020\032\022\013\n\007fs_base\020\033\022\013\n\007gs_base\020\034\022\007\n\003g"
+    "dt\020\035\022\007\n\003ldt\020\036\"\215\002\n\022Annotated_Function\022\014\n\004"
+    "name\030\001 \002(\t\022\025\n\rstart_at_addr\030\002 \002(\003\022\031\n\021sta"
+    "rt_at_addr_hex\030\003 \001(\t\022\023\n\013end_at_addr\030\004 \001("
+    "\003\022\027\n\017end_at_addr_hex\030\005 \001(\t\022&\n\006prolog\030\006 \003"
+    "(\0132\026.Annotated_Instruction\022&\n\006epilog\030\007 \003"
+    "(\0132\026.Annotated_Instruction\022 \n\016referered_"
+    "from\030\010 \003(\0132\010.Edge_64\022\027\n\005calls\030\t \003(\0132\010.Ed"
+    "ge_64\"\334\001\n\013Disassembly\022%\n\005instr\030\001 \003(\0132\026.A"
+    "nnotated_Instruction\0223\n\014branch_instr\030\002 \003"
+    "(\0132\035.Annotated_Branch_Instruction\022&\n\006reg"
+    "_32\030\003 \003(\0132\026.Annotated_Register_32\022&\n\006reg"
+    "_64\030\004 \003(\0132\026.Annotated_Register_64\022!\n\004fun"
+    "c\030\005 \003(\0132\023.Annotated_Function", 4548);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "CFG.proto", &protobuf_RegisterTypes);
   JumpTbl::default_instance_ = new JumpTbl();
@@ -2726,7 +2724,6 @@ void Block::Swap(Block* other) {
 
 #ifndef _MSC_VER
 const int Reference::kInstAddrFieldNumber;
-const int Reference::kOpdIdxFieldNumber;
 #endif  // !_MSC_VER
 
 Reference::Reference()
@@ -2746,7 +2743,6 @@ Reference::Reference(const Reference& from)
 void Reference::SharedCtor() {
   _cached_size_ = 0;
   inst_addr_ = GOOGLE_LONGLONG(0);
-  opd_idx_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -2783,7 +2779,6 @@ Reference* Reference::New() const {
 void Reference::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     inst_addr_ = GOOGLE_LONGLONG(0);
-    opd_idx_ = 0;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -2803,22 +2798,6 @@ bool Reference::MergePartialFromCodedStream(
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
                  input, &inst_addr_)));
           set_has_inst_addr();
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(16)) goto parse_opd_idx;
-        break;
-      }
-
-      // required int32 opd_idx = 2;
-      case 2: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
-         parse_opd_idx:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &opd_idx_)));
-          set_has_opd_idx();
         } else {
           goto handle_uninterpreted;
         }
@@ -2849,11 +2828,6 @@ void Reference::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->inst_addr(), output);
   }
 
-  // required int32 opd_idx = 2;
-  if (has_opd_idx()) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->opd_idx(), output);
-  }
-
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -2865,11 +2839,6 @@ void Reference::SerializeWithCachedSizes(
   // required int64 inst_addr = 1;
   if (has_inst_addr()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->inst_addr(), target);
-  }
-
-  // required int32 opd_idx = 2;
-  if (has_opd_idx()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->opd_idx(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -2888,13 +2857,6 @@ int Reference::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int64Size(
           this->inst_addr());
-    }
-
-    // required int32 opd_idx = 2;
-    if (has_opd_idx()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int32Size(
-          this->opd_idx());
     }
 
   }
@@ -2927,9 +2889,6 @@ void Reference::MergeFrom(const Reference& from) {
     if (from.has_inst_addr()) {
       set_inst_addr(from.inst_addr());
     }
-    if (from.has_opd_idx()) {
-      set_opd_idx(from.opd_idx());
-    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -2947,7 +2906,7 @@ void Reference::CopyFrom(const Reference& from) {
 }
 
 bool Reference::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
 
   return true;
 }
@@ -2955,7 +2914,6 @@ bool Reference::IsInitialized() const {
 void Reference::Swap(Reference* other) {
   if (other != this) {
     std::swap(inst_addr_, other->inst_addr_);
-    std::swap(opd_idx_, other->opd_idx_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

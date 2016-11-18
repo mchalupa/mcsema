@@ -931,27 +931,17 @@ class Reference : public ::google::protobuf::Message {
   inline ::google::protobuf::int64 inst_addr() const;
   inline void set_inst_addr(::google::protobuf::int64 value);
 
-  // required int32 opd_idx = 2;
-  inline bool has_opd_idx() const;
-  inline void clear_opd_idx();
-  static const int kOpdIdxFieldNumber = 2;
-  inline ::google::protobuf::int32 opd_idx() const;
-  inline void set_opd_idx(::google::protobuf::int32 value);
-
   // @@protoc_insertion_point(class_scope:Reference)
  private:
   inline void set_has_inst_addr();
   inline void clear_has_inst_addr();
-  inline void set_has_opd_idx();
-  inline void clear_has_opd_idx();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::int64 inst_addr_;
-  ::google::protobuf::int32 opd_idx_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
 
   friend void  protobuf_AddDesc_CFG_2eproto();
   friend void protobuf_AssignDesc_CFG_2eproto();
@@ -4660,28 +4650,6 @@ inline ::google::protobuf::int64 Reference::inst_addr() const {
 inline void Reference::set_inst_addr(::google::protobuf::int64 value) {
   set_has_inst_addr();
   inst_addr_ = value;
-}
-
-// required int32 opd_idx = 2;
-inline bool Reference::has_opd_idx() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void Reference::set_has_opd_idx() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void Reference::clear_has_opd_idx() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void Reference::clear_opd_idx() {
-  opd_idx_ = 0;
-  clear_has_opd_idx();
-}
-inline ::google::protobuf::int32 Reference::opd_idx() const {
-  return opd_idx_;
-}
-inline void Reference::set_opd_idx(::google::protobuf::int32 value) {
-  set_has_opd_idx();
-  opd_idx_ = value;
 }
 
 // -------------------------------------------------------------------
