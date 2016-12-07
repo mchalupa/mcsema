@@ -155,6 +155,8 @@ bool ElfTarget::find_in_any_section(uint32_t target, std::string &import_name)
               return true;
           }
       }
+
+      return false;
 }
 
 bool ElfTarget::find_import_name(uint32_t addrToFind, std::string &import_name)
