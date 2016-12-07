@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <llvm/IR/BasicBlock.h>
 #include <llvm/IR/InstrTypes.h>
 #include <cstdio>
+#include <cstring>
 
 using namespace llvm;
 using namespace std;
@@ -57,10 +58,12 @@ FunctionType    *getBaseFunctionType(Module *M) {
 }
 
 Triple *getTargetTriple(const llvm::Target *T) {
-    if(T->getName() == "x86")
+    if(strcmp(T->getName(), "x86") == 0)
         return new Triple("i386", "unknown", "unknown");
-    else if(T->getName() == "x86-64")
+    else if(strcmp(T->getName(), "x86-64") == 0)
         return new Triple("x86_64", "unknown", "unknown");
+
+    return NULL;
 }
 
 void doGlobalInit(Module *M) {
