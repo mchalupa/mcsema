@@ -267,10 +267,11 @@ void protobuf_AssignDesc_CFG_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(StackVar));
   Function_descriptor_ = file->message_type(8);
-  static const int Function_offsets_[3] = {
+  static const int Function_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Function, blocks_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Function, entry_address_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Function, stackvars_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Function, symbol_name_),
   };
   Function_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -787,99 +788,100 @@ void protobuf_AddDesc_CFG_2eproto() {
     "(\003\"U\n\010Variable\022\014\n\004name\030\001 \002(\t\022\014\n\004size\030\002 \002"
     "(\003\022\020\n\010ida_type\030\003 \002(\t\022\033\n\007ref_eas\030\004 \003(\0132\n."
     "Reference\"5\n\010StackVar\022\026\n\003var\030\001 \002(\0132\t.Var"
-    "iable\022\021\n\tsp_offset\030\002 \002(\003\"W\n\010Function\022\026\n\006"
+    "iable\022\021\n\tsp_offset\030\002 \002(\003\"l\n\010Function\022\026\n\006"
     "blocks\030\001 \003(\0132\006.Block\022\025\n\rentry_address\030\002 "
-    "\002(\003\022\034\n\tstackvars\030\003 \003(\0132\t.StackVar\"\244\002\n\020Ex"
-    "ternalFunction\022\023\n\013symbol_name\030\001 \002(\t\022\?\n\022c"
-    "alling_convention\030\002 \002(\0162#.ExternalFuncti"
-    "on.CallingConvention\022\022\n\nhas_return\030\003 \002(\010"
-    "\022\021\n\tno_return\030\004 \002(\010\022\026\n\016argument_count\030\005 "
-    "\002(\005\022\017\n\007is_weak\030\006 \002(\010\022\021\n\tsignature\030\007 \001(\t\""
-    "W\n\021CallingConvention\022\021\n\rCallerCleanup\020\000\022"
-    "\021\n\rCalleeCleanup\020\001\022\014\n\010FastCall\020\002\022\016\n\nMcse"
-    "maCall\020\003\"G\n\014ExternalData\022\023\n\013symbol_name\030"
-    "\001 \002(\t\022\021\n\tdata_size\030\002 \002(\005\022\017\n\007is_weak\030\003 \002("
-    "\010\"L\n\nDataSymbol\022\024\n\014base_address\030\001 \002(\003\022\023\n"
-    "\013symbol_name\030\002 \002(\t\022\023\n\013symbol_size\030\003 \002(\005\""
-    "[\n\004Data\022\024\n\014base_address\030\001 \002(\003\022\014\n\004data\030\002 "
-    "\002(\014\022\034\n\007symbols\030\003 \003(\0132\013.DataSymbol\022\021\n\trea"
-    "d_only\030\004 \002(\010\"u\n\020EntrySymbolExtra\022\022\n\nentr"
-    "y_argc\030\001 \002(\005\0228\n\013entry_cconv\030\002 \002(\0162#.Exte"
-    "rnalFunction.CallingConvention\022\023\n\013does_r"
-    "eturn\030\003 \002(\010\"`\n\013EntrySymbol\022\022\n\nentry_name"
-    "\030\001 \002(\t\022\025\n\rentry_address\030\002 \002(\003\022&\n\013entry_e"
-    "xtra\030\003 \001(\0132\021.EntrySymbolExtra\"\363\001\n\006Module"
-    "\022!\n\016internal_funcs\030\001 \003(\0132\t.Function\022)\n\016e"
-    "xternal_funcs\030\002 \003(\0132\021.ExternalFunction\022\034"
-    "\n\rinternal_data\030\003 \003(\0132\005.Data\022\023\n\013module_n"
-    "ame\030\004 \002(\t\022\035\n\007entries\030\005 \003(\0132\014.EntrySymbol"
-    "\022$\n\rexternal_data\030\006 \003(\0132\r.ExternalData\022#"
-    "\n\roffset_tables\030\007 \003(\0132\014.OffsetTable\"l\n\007E"
-    "dge_64\022\r\n\005value\030\001 \002(\003\022\033\n\004kind\030\002 \002(\0162\r.Ed"
-    "ge_64.Kind\022\r\n\005label\030\003 \001(\010\"&\n\004Kind\022\013\n\007Unk"
-    "nown\020\000\022\007\n\003May\020\001\022\010\n\004Must\020\002\"l\n\007Edge_32\022\r\n\005"
-    "value\030\001 \002(\005\022\033\n\004kind\030\002 \002(\0162\r.Edge_32.Kind"
-    "\022\r\n\005label\030\003 \001(\010\"&\n\004Kind\022\013\n\007Unknown\020\000\022\007\n\003"
-    "May\020\001\022\010\n\004Must\020\002\"\205\004\n\034Annotated_Branch_Ins"
-    "truction\022\?\n\021branch_instr_name\030\001 \002(\0162$.An"
-    "notated_Branch_Instruction.Branch\022\023\n\013is_"
-    "resolved\030\002 \002(\010\022\023\n\013is_indirect\030\003 \002(\010\022\026\n\016i"
-    "s_conditional\030\004 \002(\010\022\017\n\007is_leaf\030\005 \002(\010\022\033\n\t"
-    "target_to\030\006 \003(\0132\010.Edge_64\022%\n\005instr\030\007 \002(\013"
-    "2\026.Annotated_Instruction\022\033\n\023abstract_exp"
-    "ression\030\010 \001(\t\"\357\001\n\006Branch\022\013\n\007Unknown\020\000\022\007\n"
-    "\003jmp\020\001\022\010\n\004ljmp\020\002\022\006\n\002jo\020\003\022\007\n\003jno\020\004\022\006\n\002jb\020"
-    "\005\022\007\n\003jae\020\006\022\006\n\002je\020\007\022\007\n\003jne\020\010\022\007\n\003jbe\020\t\022\006\n\002"
-    "ja\020\n\022\006\n\002js\020\013\022\007\n\003jns\020\014\022\006\n\002jp\020\r\022\007\n\003jnp\020\016\022\006"
-    "\n\002jl\020\017\022\007\n\003jge\020\020\022\007\n\003jle\020\021\022\006\n\002jg\020\022\022\n\n\006loop"
-    "ne\020\023\022\t\n\005loope\020\024\022\010\n\004loop\020\025\022\t\n\005jCcxz\020\026\022\007\n\003"
-    "ret\020\027\022\010\n\004call\020\030\"\270\003\n\025Annotated_Instructio"
-    "n\022\022\n\ninstr_name\030\001 \002(\t\022\024\n\014instr_string\030\002 "
-    "\002(\t\022\021\n\tinst_addr\030\003 \002(\003\022\020\n\010inst_len\030\004 \002(\005"
-    "\022\020\n\010op_count\030\005 \002(\005\022\025\n\rinst_addr_hex\030\006 \001("
-    "\t\022\035\n\025is_branch_instruction\030\007 \002(\010\0220\n\010argu"
-    "ment\030\010 \003(\0132\036.Annotated_Instruction.Opera"
-    "nd\022 \n\016referered_from\030\t \003(\0132\010.Edge_64\032\263\001\n"
-    "\007Operand\022\013\n\003pos\030\001 \002(\005\0229\n\004type\030\002 \002(\0162+.An"
-    "notated_Instruction.Operand.Operand_Type"
-    "\022\r\n\005value\030\003 \001(\t\"Q\n\014Operand_Type\022\013\n\007Unkno"
-    "wn\020\000\022\r\n\tImmediate\020\001\022\014\n\010Register\020\002\022\n\n\006Mem"
-    "ory\020\003\022\013\n\007Address\020\004\"\251\003\n\025Annotated_Registe"
-    "r_32\022-\n\004name\030\001 \002(\0162\037.Annotated_Register_"
-    "32.Register\022\024\n\014used_at_addr\030\002 \002(\003\022\030\n\020use"
-    "d_at_addr_hex\030\003 \001(\t\022\027\n\005value\030\007 \003(\0132\010.Edg"
-    "e_32\022-\n\004fact\030\010 \002(\0132\037.Annotated_Register_"
-    "32.Property\022\033\n\023abstract_expression\030\t \001(\t"
-    "\032*\n\010Property\022\017\n\007Unknown\030\001 \002(\010\022\r\n\005Alive\030\002"
-    " \001(\010\"\237\001\n\010Register\022\013\n\007Unknown\020\000\022\007\n\003eax\020\001\022"
-    "\007\n\003ecx\020\002\022\007\n\003edx\020\003\022\007\n\003ebx\020\004\022\007\n\003esp\020\005\022\007\n\003e"
-    "bp\020\006\022\007\n\003esi\020\007\022\007\n\003edi\020\010\022\007\n\003eip\020\t\022\013\n\007fs_ba"
-    "se\020\n\022\013\n\007gs_base\020\013\022\007\n\003gtd\020\014\022\007\n\003ldt\020\r\022\t\n\005m"
-    "xcsr\020\016\"\344\003\n\025Annotated_Register_64\022-\n\004name"
-    "\030\001 \002(\0162\037.Annotated_Register_64.Register\022"
-    "\024\n\014used_at_addr\030\002 \002(\003\022\030\n\020used_at_addr_he"
-    "x\030\003 \001(\t\022\027\n\005value\030\004 \003(\0132\010.Edge_64\022-\n\004fact"
-    "\030\005 \002(\0132\037.Annotated_Register_64.Property\022"
-    "\033\n\023abstract_expression\030\006 \001(\t\032*\n\010Property"
-    "\022\017\n\007Unknown\030\001 \002(\010\022\r\n\005Alive\030\002 \001(\010\"\332\001\n\010Reg"
-    "ister\022\013\n\007Unknown\020\000\022\007\n\003rax\020\n\022\007\n\003rcx\020\013\022\007\n\003"
-    "rdx\020\014\022\007\n\003rbx\020\r\022\007\n\003rsp\020\016\022\007\n\003rbp\020\017\022\007\n\003rsi\020"
-    "\020\022\007\n\003rdi\020\021\022\007\n\003rip\020\022\022\006\n\002r8\020\023\022\006\n\002r9\020\024\022\007\n\003r"
-    "10\020\025\022\007\n\003r11\020\026\022\007\n\003r12\020\027\022\007\n\003r13\020\030\022\007\n\003r14\020\031"
-    "\022\007\n\003r15\020\032\022\013\n\007fs_base\020\033\022\013\n\007gs_base\020\034\022\007\n\003g"
-    "dt\020\035\022\007\n\003ldt\020\036\"\215\002\n\022Annotated_Function\022\014\n\004"
-    "name\030\001 \002(\t\022\025\n\rstart_at_addr\030\002 \002(\003\022\031\n\021sta"
-    "rt_at_addr_hex\030\003 \001(\t\022\023\n\013end_at_addr\030\004 \001("
-    "\003\022\027\n\017end_at_addr_hex\030\005 \001(\t\022&\n\006prolog\030\006 \003"
-    "(\0132\026.Annotated_Instruction\022&\n\006epilog\030\007 \003"
-    "(\0132\026.Annotated_Instruction\022 \n\016referered_"
-    "from\030\010 \003(\0132\010.Edge_64\022\027\n\005calls\030\t \003(\0132\010.Ed"
-    "ge_64\"\334\001\n\013Disassembly\022%\n\005instr\030\001 \003(\0132\026.A"
-    "nnotated_Instruction\0223\n\014branch_instr\030\002 \003"
-    "(\0132\035.Annotated_Branch_Instruction\022&\n\006reg"
-    "_32\030\003 \003(\0132\026.Annotated_Register_32\022&\n\006reg"
-    "_64\030\004 \003(\0132\026.Annotated_Register_64\022!\n\004fun"
-    "c\030\005 \003(\0132\023.Annotated_Function", 4708);
+    "\002(\003\022\034\n\tstackvars\030\003 \003(\0132\t.StackVar\022\023\n\013sym"
+    "bol_name\030\004 \001(\t\"\244\002\n\020ExternalFunction\022\023\n\013s"
+    "ymbol_name\030\001 \002(\t\022\?\n\022calling_convention\030\002"
+    " \002(\0162#.ExternalFunction.CallingConventio"
+    "n\022\022\n\nhas_return\030\003 \002(\010\022\021\n\tno_return\030\004 \002(\010"
+    "\022\026\n\016argument_count\030\005 \002(\005\022\017\n\007is_weak\030\006 \002("
+    "\010\022\021\n\tsignature\030\007 \001(\t\"W\n\021CallingConventio"
+    "n\022\021\n\rCallerCleanup\020\000\022\021\n\rCalleeCleanup\020\001\022"
+    "\014\n\010FastCall\020\002\022\016\n\nMcsemaCall\020\003\"G\n\014Externa"
+    "lData\022\023\n\013symbol_name\030\001 \002(\t\022\021\n\tdata_size\030"
+    "\002 \002(\005\022\017\n\007is_weak\030\003 \002(\010\"L\n\nDataSymbol\022\024\n\014"
+    "base_address\030\001 \002(\003\022\023\n\013symbol_name\030\002 \002(\t\022"
+    "\023\n\013symbol_size\030\003 \002(\005\"[\n\004Data\022\024\n\014base_add"
+    "ress\030\001 \002(\003\022\014\n\004data\030\002 \002(\014\022\034\n\007symbols\030\003 \003("
+    "\0132\013.DataSymbol\022\021\n\tread_only\030\004 \002(\010\"u\n\020Ent"
+    "rySymbolExtra\022\022\n\nentry_argc\030\001 \002(\005\0228\n\013ent"
+    "ry_cconv\030\002 \002(\0162#.ExternalFunction.Callin"
+    "gConvention\022\023\n\013does_return\030\003 \002(\010\"`\n\013Entr"
+    "ySymbol\022\022\n\nentry_name\030\001 \002(\t\022\025\n\rentry_add"
+    "ress\030\002 \002(\003\022&\n\013entry_extra\030\003 \001(\0132\021.EntryS"
+    "ymbolExtra\"\363\001\n\006Module\022!\n\016internal_funcs\030"
+    "\001 \003(\0132\t.Function\022)\n\016external_funcs\030\002 \003(\013"
+    "2\021.ExternalFunction\022\034\n\rinternal_data\030\003 \003"
+    "(\0132\005.Data\022\023\n\013module_name\030\004 \002(\t\022\035\n\007entrie"
+    "s\030\005 \003(\0132\014.EntrySymbol\022$\n\rexternal_data\030\006"
+    " \003(\0132\r.ExternalData\022#\n\roffset_tables\030\007 \003"
+    "(\0132\014.OffsetTable\"l\n\007Edge_64\022\r\n\005value\030\001 \002"
+    "(\003\022\033\n\004kind\030\002 \002(\0162\r.Edge_64.Kind\022\r\n\005label"
+    "\030\003 \001(\010\"&\n\004Kind\022\013\n\007Unknown\020\000\022\007\n\003May\020\001\022\010\n\004"
+    "Must\020\002\"l\n\007Edge_32\022\r\n\005value\030\001 \002(\005\022\033\n\004kind"
+    "\030\002 \002(\0162\r.Edge_32.Kind\022\r\n\005label\030\003 \001(\010\"&\n\004"
+    "Kind\022\013\n\007Unknown\020\000\022\007\n\003May\020\001\022\010\n\004Must\020\002\"\205\004\n"
+    "\034Annotated_Branch_Instruction\022\?\n\021branch_"
+    "instr_name\030\001 \002(\0162$.Annotated_Branch_Inst"
+    "ruction.Branch\022\023\n\013is_resolved\030\002 \002(\010\022\023\n\013i"
+    "s_indirect\030\003 \002(\010\022\026\n\016is_conditional\030\004 \002(\010"
+    "\022\017\n\007is_leaf\030\005 \002(\010\022\033\n\ttarget_to\030\006 \003(\0132\010.E"
+    "dge_64\022%\n\005instr\030\007 \002(\0132\026.Annotated_Instru"
+    "ction\022\033\n\023abstract_expression\030\010 \001(\t\"\357\001\n\006B"
+    "ranch\022\013\n\007Unknown\020\000\022\007\n\003jmp\020\001\022\010\n\004ljmp\020\002\022\006\n"
+    "\002jo\020\003\022\007\n\003jno\020\004\022\006\n\002jb\020\005\022\007\n\003jae\020\006\022\006\n\002je\020\007\022"
+    "\007\n\003jne\020\010\022\007\n\003jbe\020\t\022\006\n\002ja\020\n\022\006\n\002js\020\013\022\007\n\003jns"
+    "\020\014\022\006\n\002jp\020\r\022\007\n\003jnp\020\016\022\006\n\002jl\020\017\022\007\n\003jge\020\020\022\007\n\003"
+    "jle\020\021\022\006\n\002jg\020\022\022\n\n\006loopne\020\023\022\t\n\005loope\020\024\022\010\n\004"
+    "loop\020\025\022\t\n\005jCcxz\020\026\022\007\n\003ret\020\027\022\010\n\004call\020\030\"\270\003\n"
+    "\025Annotated_Instruction\022\022\n\ninstr_name\030\001 \002"
+    "(\t\022\024\n\014instr_string\030\002 \002(\t\022\021\n\tinst_addr\030\003 "
+    "\002(\003\022\020\n\010inst_len\030\004 \002(\005\022\020\n\010op_count\030\005 \002(\005\022"
+    "\025\n\rinst_addr_hex\030\006 \001(\t\022\035\n\025is_branch_inst"
+    "ruction\030\007 \002(\010\0220\n\010argument\030\010 \003(\0132\036.Annota"
+    "ted_Instruction.Operand\022 \n\016referered_fro"
+    "m\030\t \003(\0132\010.Edge_64\032\263\001\n\007Operand\022\013\n\003pos\030\001 \002"
+    "(\005\0229\n\004type\030\002 \002(\0162+.Annotated_Instruction"
+    ".Operand.Operand_Type\022\r\n\005value\030\003 \001(\t\"Q\n\014"
+    "Operand_Type\022\013\n\007Unknown\020\000\022\r\n\tImmediate\020\001"
+    "\022\014\n\010Register\020\002\022\n\n\006Memory\020\003\022\013\n\007Address\020\004\""
+    "\251\003\n\025Annotated_Register_32\022-\n\004name\030\001 \002(\0162"
+    "\037.Annotated_Register_32.Register\022\024\n\014used"
+    "_at_addr\030\002 \002(\003\022\030\n\020used_at_addr_hex\030\003 \001(\t"
+    "\022\027\n\005value\030\007 \003(\0132\010.Edge_32\022-\n\004fact\030\010 \002(\0132"
+    "\037.Annotated_Register_32.Property\022\033\n\023abst"
+    "ract_expression\030\t \001(\t\032*\n\010Property\022\017\n\007Unk"
+    "nown\030\001 \002(\010\022\r\n\005Alive\030\002 \001(\010\"\237\001\n\010Register\022\013"
+    "\n\007Unknown\020\000\022\007\n\003eax\020\001\022\007\n\003ecx\020\002\022\007\n\003edx\020\003\022\007"
+    "\n\003ebx\020\004\022\007\n\003esp\020\005\022\007\n\003ebp\020\006\022\007\n\003esi\020\007\022\007\n\003ed"
+    "i\020\010\022\007\n\003eip\020\t\022\013\n\007fs_base\020\n\022\013\n\007gs_base\020\013\022\007"
+    "\n\003gtd\020\014\022\007\n\003ldt\020\r\022\t\n\005mxcsr\020\016\"\344\003\n\025Annotate"
+    "d_Register_64\022-\n\004name\030\001 \002(\0162\037.Annotated_"
+    "Register_64.Register\022\024\n\014used_at_addr\030\002 \002"
+    "(\003\022\030\n\020used_at_addr_hex\030\003 \001(\t\022\027\n\005value\030\004 "
+    "\003(\0132\010.Edge_64\022-\n\004fact\030\005 \002(\0132\037.Annotated_"
+    "Register_64.Property\022\033\n\023abstract_express"
+    "ion\030\006 \001(\t\032*\n\010Property\022\017\n\007Unknown\030\001 \002(\010\022\r"
+    "\n\005Alive\030\002 \001(\010\"\332\001\n\010Register\022\013\n\007Unknown\020\000\022"
+    "\007\n\003rax\020\n\022\007\n\003rcx\020\013\022\007\n\003rdx\020\014\022\007\n\003rbx\020\r\022\007\n\003r"
+    "sp\020\016\022\007\n\003rbp\020\017\022\007\n\003rsi\020\020\022\007\n\003rdi\020\021\022\007\n\003rip\020\022"
+    "\022\006\n\002r8\020\023\022\006\n\002r9\020\024\022\007\n\003r10\020\025\022\007\n\003r11\020\026\022\007\n\003r1"
+    "2\020\027\022\007\n\003r13\020\030\022\007\n\003r14\020\031\022\007\n\003r15\020\032\022\013\n\007fs_bas"
+    "e\020\033\022\013\n\007gs_base\020\034\022\007\n\003gdt\020\035\022\007\n\003ldt\020\036\"\215\002\n\022A"
+    "nnotated_Function\022\014\n\004name\030\001 \002(\t\022\025\n\rstart"
+    "_at_addr\030\002 \002(\003\022\031\n\021start_at_addr_hex\030\003 \001("
+    "\t\022\023\n\013end_at_addr\030\004 \001(\003\022\027\n\017end_at_addr_he"
+    "x\030\005 \001(\t\022&\n\006prolog\030\006 \003(\0132\026.Annotated_Inst"
+    "ruction\022&\n\006epilog\030\007 \003(\0132\026.Annotated_Inst"
+    "ruction\022 \n\016referered_from\030\010 \003(\0132\010.Edge_6"
+    "4\022\027\n\005calls\030\t \003(\0132\010.Edge_64\"\334\001\n\013Disassemb"
+    "ly\022%\n\005instr\030\001 \003(\0132\026.Annotated_Instructio"
+    "n\0223\n\014branch_instr\030\002 \003(\0132\035.Annotated_Bran"
+    "ch_Instruction\022&\n\006reg_32\030\003 \003(\0132\026.Annotat"
+    "ed_Register_32\022&\n\006reg_64\030\004 \003(\0132\026.Annotat"
+    "ed_Register_64\022!\n\004func\030\005 \003(\0132\023.Annotated"
+    "_Function", 4729);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "CFG.proto", &protobuf_RegisterTypes);
   OffsetTable::default_instance_ = new OffsetTable();
@@ -3935,6 +3937,7 @@ void StackVar::Swap(StackVar* other) {
 const int Function::kBlocksFieldNumber;
 const int Function::kEntryAddressFieldNumber;
 const int Function::kStackvarsFieldNumber;
+const int Function::kSymbolNameFieldNumber;
 #endif  // !_MSC_VER
 
 Function::Function()
@@ -3954,6 +3957,7 @@ Function::Function(const Function& from)
 void Function::SharedCtor() {
   _cached_size_ = 0;
   entry_address_ = GOOGLE_LONGLONG(0);
+  symbol_name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -3962,6 +3966,9 @@ Function::~Function() {
 }
 
 void Function::SharedDtor() {
+  if (symbol_name_ != &::google::protobuf::internal::kEmptyString) {
+    delete symbol_name_;
+  }
   if (this != default_instance_) {
   }
 }
@@ -3990,6 +3997,11 @@ Function* Function::New() const {
 void Function::Clear() {
   if (_has_bits_[1 / 32] & (0xffu << (1 % 32))) {
     entry_address_ = GOOGLE_LONGLONG(0);
+    if (has_symbol_name()) {
+      if (symbol_name_ != &::google::protobuf::internal::kEmptyString) {
+        symbol_name_->clear();
+      }
+    }
   }
   blocks_.Clear();
   stackvars_.Clear();
@@ -4045,6 +4057,23 @@ bool Function::MergePartialFromCodedStream(
           goto handle_uninterpreted;
         }
         if (input->ExpectTag(26)) goto parse_stackvars;
+        if (input->ExpectTag(34)) goto parse_symbol_name;
+        break;
+      }
+
+      // optional string symbol_name = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_symbol_name:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_symbol_name()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->symbol_name().data(), this->symbol_name().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -4084,6 +4113,15 @@ void Function::SerializeWithCachedSizes(
       3, this->stackvars(i), output);
   }
 
+  // optional string symbol_name = 4;
+  if (has_symbol_name()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->symbol_name().data(), this->symbol_name().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      4, this->symbol_name(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -4111,6 +4149,16 @@ void Function::SerializeWithCachedSizes(
         3, this->stackvars(i), target);
   }
 
+  // optional string symbol_name = 4;
+  if (has_symbol_name()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->symbol_name().data(), this->symbol_name().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->symbol_name(), target);
+  }
+
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -4127,6 +4175,13 @@ int Function::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int64Size(
           this->entry_address());
+    }
+
+    // optional string symbol_name = 4;
+    if (has_symbol_name()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->symbol_name());
     }
 
   }
@@ -4177,6 +4232,9 @@ void Function::MergeFrom(const Function& from) {
     if (from.has_entry_address()) {
       set_entry_address(from.entry_address());
     }
+    if (from.has_symbol_name()) {
+      set_symbol_name(from.symbol_name());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -4210,6 +4268,7 @@ void Function::Swap(Function* other) {
     blocks_.Swap(&other->blocks_);
     std::swap(entry_address_, other->entry_address_);
     stackvars_.Swap(&other->stackvars_);
+    std::swap(symbol_name_, other->symbol_name_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

@@ -1403,10 +1403,6 @@ static bool insertFunctionIntoModule(NativeModulePtr mod,
   TASSERT(entryBlock != nullptr, "");
 
   allocateRegisterLocals(F, ArchPointerSize(M));
-  //and at the beginning of the function, we spill all the context
-
-  writeContextToLocals(entryBlock, ArchPointerSize(M), ABICallSpill);
-  //writeContextToLocals(entryBlock, 32, AllRegs);
 
   // allocate any function local variables recovered
   // TODO: only allocates. right now they aren't hooked up to anything.

@@ -444,7 +444,6 @@ private:
             default:
                 return 0;
         }
-    }
   }
 
   unsigned int get_opcode(void) {
@@ -570,7 +569,7 @@ typedef boost::shared_ptr<NativeStackVar> NativeStackVarPtr;
 class NativeFunction {
     public:
     NativeFunction(VA b) : funcEntryVA(b), nextBlockID(0), graph(nullptr) { }
-    NativeFunction(VA b, cont std::string &sym) : funcEntryVA(b), funcSymName(sym), nextBlockID(0), graph(nullptr) { }
+    NativeFunction(VA b, const std::string &sym) : funcEntryVA(b), funcSymName(sym), nextBlockID(0), graph(nullptr) { }
     void add_block(NativeBlockPtr);
     void add_stackvar(NativeStackVarPtr);
     std::list<NativeStackVarPtr> get_stackvars(void) { return this->stackvars; }

@@ -306,7 +306,7 @@ static ExternalCodeRefPtr getExternal(const std::string &s, const list<ExternalC
 }
 
 InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder, 
-		const std::list<NativeStackVarPtr> &stackvars, const list<EternalCodeRefPtr> &extcode)
+		const std::list<NativeStackVarPtr> &stackvars, const list<ExternalCodeRefPtr> &extcode)
 {
   VA                      addr = inst.inst_addr();
   boost::int64_t          tr_tgt = inst.true_target();
@@ -431,7 +431,7 @@ InstPtr deserializeInst(const ::Instruction &inst, LLVMByteDecoder &decoder,
 
 NativeBlockPtr  deserializeBlock( const ::Block   &block,
                                   LLVMByteDecoder &decoder,
-                                  const std::list<NativeStackVarPtr> &stackvars
+                                  const std::list<NativeStackVarPtr> &stackvars,
 				  const list<ExternalCodeRefPtr> &extcode)
 {
   NativeBlockPtr  natB =

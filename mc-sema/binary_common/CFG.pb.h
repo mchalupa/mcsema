@@ -1376,19 +1376,34 @@ class Function : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::StackVar >*
       mutable_stackvars();
 
+  // optional string symbol_name = 4;
+  inline bool has_symbol_name() const;
+  inline void clear_symbol_name();
+  static const int kSymbolNameFieldNumber = 4;
+  inline const ::std::string& symbol_name() const;
+  inline void set_symbol_name(const ::std::string& value);
+  inline void set_symbol_name(const char* value);
+  inline void set_symbol_name(const char* value, size_t size);
+  inline ::std::string* mutable_symbol_name();
+  inline ::std::string* release_symbol_name();
+  inline void set_allocated_symbol_name(::std::string* symbol_name);
+
   // @@protoc_insertion_point(class_scope:Function)
  private:
   inline void set_has_entry_address();
   inline void clear_has_entry_address();
+  inline void set_has_symbol_name();
+  inline void clear_has_symbol_name();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::RepeatedPtrField< ::Block > blocks_;
   ::google::protobuf::int64 entry_address_;
   ::google::protobuf::RepeatedPtrField< ::StackVar > stackvars_;
+  ::std::string* symbol_name_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
 
   friend void  protobuf_AddDesc_CFG_2eproto();
   friend void protobuf_AssignDesc_CFG_2eproto();
@@ -5213,6 +5228,76 @@ Function::stackvars() const {
 inline ::google::protobuf::RepeatedPtrField< ::StackVar >*
 Function::mutable_stackvars() {
   return &stackvars_;
+}
+
+// optional string symbol_name = 4;
+inline bool Function::has_symbol_name() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void Function::set_has_symbol_name() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void Function::clear_has_symbol_name() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void Function::clear_symbol_name() {
+  if (symbol_name_ != &::google::protobuf::internal::kEmptyString) {
+    symbol_name_->clear();
+  }
+  clear_has_symbol_name();
+}
+inline const ::std::string& Function::symbol_name() const {
+  return *symbol_name_;
+}
+inline void Function::set_symbol_name(const ::std::string& value) {
+  set_has_symbol_name();
+  if (symbol_name_ == &::google::protobuf::internal::kEmptyString) {
+    symbol_name_ = new ::std::string;
+  }
+  symbol_name_->assign(value);
+}
+inline void Function::set_symbol_name(const char* value) {
+  set_has_symbol_name();
+  if (symbol_name_ == &::google::protobuf::internal::kEmptyString) {
+    symbol_name_ = new ::std::string;
+  }
+  symbol_name_->assign(value);
+}
+inline void Function::set_symbol_name(const char* value, size_t size) {
+  set_has_symbol_name();
+  if (symbol_name_ == &::google::protobuf::internal::kEmptyString) {
+    symbol_name_ = new ::std::string;
+  }
+  symbol_name_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* Function::mutable_symbol_name() {
+  set_has_symbol_name();
+  if (symbol_name_ == &::google::protobuf::internal::kEmptyString) {
+    symbol_name_ = new ::std::string;
+  }
+  return symbol_name_;
+}
+inline ::std::string* Function::release_symbol_name() {
+  clear_has_symbol_name();
+  if (symbol_name_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = symbol_name_;
+    symbol_name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+inline void Function::set_allocated_symbol_name(::std::string* symbol_name) {
+  if (symbol_name_ != &::google::protobuf::internal::kEmptyString) {
+    delete symbol_name_;
+  }
+  if (symbol_name) {
+    set_has_symbol_name();
+    symbol_name_ = symbol_name;
+  } else {
+    clear_has_symbol_name();
+    symbol_name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  }
 }
 
 // -------------------------------------------------------------------

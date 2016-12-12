@@ -98,6 +98,7 @@ message Function {
     repeated    Block       blocks = 1;
     required    int64       entry_address = 2;
     repeated    StackVar    stackvars = 3;
+    optional    string      symbol_name = 4;
 }
 
 message ExternalFunction {
